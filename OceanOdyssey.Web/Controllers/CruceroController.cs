@@ -92,6 +92,7 @@ namespace OceanOdyssey.Web.Controllers
 
          
 
+
             // Si no se proporcionó una imagen, pero se subió un archivo de imagen
             if (cruceroDTO.Imagen == null)
             {
