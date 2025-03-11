@@ -1,0 +1,87 @@
+﻿@model IEnumerable<OceanOdyssey.Application.DTOs.CruceroDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Cruceros Disponibles</h1>
+
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <!-- Ajusta columnas según el tamaño de pantalla -->
+                <div class="card" style="width: 100%;">
+                    <img class="card-img-top"
+                         style="max-height:111px;"
+                         role="img"
+                         src="data:image/jpeg;charset=utf-8;base64,@Convert.ToBase64String(item.Imagen)"
+                         alt="Imagen" />
+                    <!-- Ajusta el ancho dinámicamente -->
+                    <h5 class="card-title">@Html.DisplayFor(ModelItem => item.Nombre)</h5>
+                    <div class="card-body">
+                        <p class="card-text"> Duracion: @Html.DisplayFor(ModelItem => item.Duracion) Dias</p>
+                        <p>Precio: $ @Html.DisplayFor(ModelItem => item.Costo)</p>
+                        
+
+                    </div>
+                    <div class="card-footer">
+                        <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.Id"><i class="bi bi-eye"></i>Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<style>
+
+
+    .card {
+        color: black;
+        width: 300px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.8s ease-in-out, box-shadow 0.8s ease-in-out;
+    }
+
+    .card-title {
+        background-color: #80c4ac;
+        color: black;
+        padding: 16px;
+        text-align: center;
+    }
+
+    .card-footer a {
+        text-decoration: none;
+    }
+
+        .card-footer a:hover {
+            text-decoration: none;
+        }
+
+    .card-footer {
+        background-color: #f4f4f4;
+        padding: 8px;
+        text-align: center;
+    }
+
+    .card-body {
+        padding: 16px;
+        display: none;
+    }
+
+
+
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+        .card:hover .card-body {
+            display: block;
+        }
+
+</style>

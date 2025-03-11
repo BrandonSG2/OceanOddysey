@@ -1,0 +1,60 @@
+﻿@model OceanOdyssey.Web.ViewModels.ViewModelInput
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center rounded-top">
+                    <h4 class="mb-0">Establecer Fechas y Precios para Habitaciones</h4>
+                </div>
+                <div class="card-body bg-light p-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="FechaInicio" class="fw-bold"></label>
+                        <input asp-for="FechaInicio" type="date" class="form-control" />
+                        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="FechaLimitePago" class="fw-bold"></label>
+                        <input asp-for="FechaLimitePago" type="date" class="form-control" />
+                        <span asp-validation-for="FechaLimitePago" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="IdHabitacion" class="fw-bold"></label>
+                        <select asp-for="IdHabitacion" id="IdHabitacionModal" class="form-select">
+                            <option value="">Seleccione una habitación</option>
+                        </select>
+                        <span asp-validation-for="IdHabitacion" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Precio" class="fw-bold"></label>
+                        <input asp-for="Precio" id="PrecioModal" type="number" class="form-control" />
+                        <span asp-validation-for="Precio" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-success btn-lg" onclick="addLibro()">
+                            <i class="fas fa-shopping-cart"></i> Agregar habitacion al crucero 
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a asp-action="Create" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Regresar al crucero
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

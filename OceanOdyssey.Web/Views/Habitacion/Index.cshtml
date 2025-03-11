@@ -1,0 +1,86 @@
+﻿@model IEnumerable<OceanOdyssey.Application.DTOs.HabitacionDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Habitaciones en ocean Odyssey</h1>
+
+
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <!-- Ajusta columnas según el tamaño de pantalla -->
+                <div class="card" style="width: 100%;">
+                    <!-- Ajusta el ancho dinámicamente -->
+                    <h5 class="card-title">@Html.DisplayFor(ModelItem => item.Nombre)</h5>
+                    <div class="card-body">
+                        <p class="card-text">@Html.DisplayFor(ModelItem => item.Detalles)</p>
+                        <p>Capacidad: @Html.DisplayFor(ModelItem => item.CapacidadMaxima)</p>
+                        <p>Tamaño: @Html.DisplayFor(ModelItem => item.Tamanno)</p>
+                        
+                    </div>
+                    <div class="card-footer">
+                        <a  class="btn btn-primary" asp-action="Details" asp-route-id="@item.Id"><i class="bi bi-eye"></i>Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<style>
+    
+
+    .card {
+        color:black;
+        width: 300px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.8s ease-in-out, box-shadow 0.8s ease-in-out;
+    }
+
+    .card-title {
+        background-color: #80c4ac;
+        color: black;
+        padding: 16px;
+        text-align: center;
+    }
+
+    .card-footer a {
+        text-decoration: none;
+    }
+
+        .card-footer a:hover {
+            text-decoration: none;
+        }
+    .card-footer {
+        background-color: #f4f4f4;
+        padding: 8px;
+        text-align: center;
+    }
+    .card-body {
+        padding: 16px;
+        display: none;
+    }
+
+    
+
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+        .card:hover .card-body {
+            display: block;
+        }
+
+    
+
+    
+
+        
+</style>

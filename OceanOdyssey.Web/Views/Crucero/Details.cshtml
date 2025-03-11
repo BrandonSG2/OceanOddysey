@@ -1,0 +1,85 @@
+﻿@model OceanOdyssey.Application.DTOs.CruceroDTO
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1 class="text-center">Detalle de @Html.DisplayFor(Model => Model.Nombre)</h1>
+<div class="container-fluid">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-sm-2  border">
+        <div class="col">
+            <img class="card-img-top"
+                 style="max-width:460px;"
+                 role="img"
+                 src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Imagen!)"
+                 alt="Imagen" />
+        </div>
+        <div class="col text-center" style="color:black">
+            <p class="fs-3">@Html.DisplayFor(Model => Model.Nombre)</p>
+            @foreach (var fecha in Model.FechaCrucero)
+            {
+                <p>Fechas de inicio: @Html.DisplayFor(Modelitem=>fecha.FechaInicio)</p>
+            }
+            <div class="row row-cols-1 row-cols-md-2 row-cols-sm-2">
+                <div class="col">Cantidad de dias: @Html.DisplayFor(Model => Model.Duracion) dias</div>
+                <div class="col">Nombre del barco:  @Html.DisplayFor(Model => Model.IdbarcoNavigation.Nombre)</div>
+
+            </div>
+            <p class="fs-3">Itinerario</p>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-sm-1">
+                @foreach (var itinerario in Model.Itinerario)
+                {
+                    <div class="col">
+                        <p class="border-top border-black">Dia numero: @Html.DisplayFor(Modelitem => itinerario.Dia)</p>
+                        <p>Puerto a visitar: @Html.DisplayFor(Modelitem => itinerario.IdpuertoNavigation!.Nombre)</p>
+                        <p>Descripcion: @Html.DisplayFor(Modelitem => itinerario.Descripcion)</p>
+                    </div>
+
+                }
+
+            </div>
+        </div>
+    </div>
+    <div class="card mt-4">
+        <div class="card-header bg-success text-white">
+            <h3 class="card-title">Habitaciones</h3>
+        </div>
+        <div class="card-body">
+            @foreach (var fecha in Model.FechaCrucero.Where(f => f.Idcrucero == Model.Id).OrderBy(f => f.Id))
+            {
+                <h4 class="text-primary mt-3">Fecha de Crucero: @fecha.FechaInicio</h4>
+
+                @foreach (var barcoHabitacion in Model.IdbarcoNavigation.BarcoHabitacion)
+                {
+                    var preciosFecha = barcoHabitacion.IdhabitacionNavigation!.PrecioHabitacion
+                    .Where(p => p.IdFechaCruceroNavigation!.Id == fecha.Id)
+                    .ToList();
+
+                    <div class="border p-3 mb-3 rounded shadow-sm">
+                        <h5 class="font-weight-bold">
+                            Habitación: @barcoHabitacion.IdhabitacionNavigation.Nombre
+                        </h5>
+
+                        @if (preciosFecha.Any())
+                        {
+                            @foreach (var precio in preciosFecha)
+                            {
+                                <p><strong>Precio:</strong> $@precio.Costo</p>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-danger"><strong>No hay precio disponible para esta fecha.</strong></p>
+                        }
+                    </div>
+                }
+            }
+            
+        </div>
+    </div>
+    <div class="text-center mt-4">
+
+        <a class="btn btn-secondary" asp-action="Index">Regresar a la Lista</a>
+    </div>
+</div>
+

@@ -1,0 +1,456 @@
+﻿@model OceanOdyssey.Application.DTOs.CruceroDTO
+
+@{
+    ViewData["Title"] = "Crear Crucero";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary text-center">Crear Nuevo Crucero</h2>
+    <hr />
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Aumentamos el ancho aquí -->
+            <form asp-action="Create" class="p-5 border rounded shadow-lg bg-light" enctype="multipart/form-data" data-ajax="true"
+                  data-ajax-method="POST"
+                  data-ajax-begin="onBegin"
+                  data-ajax-failure="onFailure"
+                  data-ajax-success="onSuccess"
+                  data-ajax-complete="onComplete">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Nombre" class="control-label fw-bold"></label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre del crucero" />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Idbarco" class="control-label fw-bold"></label>
+                    @Html.DropDownListFor(m => m.Idbarco,
+                             new SelectList(ViewBag.ListBarco, "Id", "Nombre"),
+                             new { @class = "form-select", id = "selectBarco" })
+                    <span asp-validation-for="Idbarco" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Imagen" class="control-label fw-bold"></label>
+                    <input type="file" class="form-control" id="ImageFile" name="ImageFile" required />
+                    <span asp-validation-for="Imagen" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Duracion" class="control-label fw-bold"></label>
+                    <input asp-for="Duracion" class="form-control" id="Duracion" placeholder="Ingrese la duración en días" />
+                    <span asp-validation-for="Duracion" class="text-danger"></span>
+                </div>
+
+
+
+
+                <div class="col">
+                    <label asp-for="Itinerario" class="control-label fw-bold"></label>
+                    <button type="button" id="generarItinerario" class="btn btn-danger w-100 mb-3">Generar Itinerario</button>
+                    <div id="itinerarioContainer" class="mt-3"></div>
+                    <div class="mt-4 text-center">
+                        <button type="button" class="btn btn-primary w-100" onclick="addItinerario()">Agregar Itinerario a Crucero</button>
+
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+                <div class="col">
+
+
+                    <button type="button" class="btn btn-warning w-100 mb-3" id="agregarFecha">Agregar Nueva Fecha</button>
+
+                    <div class="mt-4 text-center">
+                        <button type="button" class="btn btn-primary w-100" onclick="addFechas()">Agregar Fechas a Crucero</button>
+
+                    </div>
+
+                    <!-- Contenedor donde se agregarán las fechas y habitaciones -->
+                    <div id="fechasContainer"></div>
+                </div>
+
+
+
+              
+
+@* 
+                <div class="col-md-12">
+                    <div id="detalleOrdenView">
+                        @await Html.PartialAsync("_DetailCrucero")
+                    </div>
+                </div> *@
+
+               @*  <button type="button" class="btn btn-success w-100 p-2" data-bs-toggle="modal" data-bs-target="#myModal">Agregar Fecha y Precio Habitación</button> *@
+                <button type="submit" class="btn btn-primary w-100 mt-3 p-2">Crear</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Agrandado -->
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agregar Fecha y Precio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="mostrar"></div>
+                @await Html.PartialAsync("_AddFechaPrecio")
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a asp-action="Index" class="btn btn-outline-dark">Volver a la lista</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+
+    <script>
+        $(document).ready(function () {
+
+            $("#selectBarco").change(function () {
+                $("#fechasContainer").empty(); 
+              
+            });
+
+          
+            $("#agregarFecha").click(function () {
+                var barcoId = $("#selectBarco").val();
+
+                if (!barcoId) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Por favor, seleccione un barco antes de agregar una fecha.",
+                        icon: "error"
+                    });
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("GetHabitacionesPorBarco", "Crucero")',
+                    type: 'GET',
+                    data: { idBarco: barcoId },
+                    success: function (habitaciones) {
+                        // Obtener correctamente el índice basado en la cantidad de fechas actuales
+                        var fechaIndex = $("#fechasContainer .fecha-item").length;
+
+                        var fechaHtml = `
+                        <div class="fecha-item border p-4 mb-3 rounded bg-white shadow-sm" data-index="${fechaIndex}">
+                            <h5 class="text-secondary">Fecha ${fechaIndex + 1}</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="fw-bold">Fecha de Inicio</label>
+                                        <input type="date" name="FechaInicio${fechaIndex}" class="form-control fecha-inicio" required />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="fw-bold">Fecha Límite</label>
+                                        <input type="date" name="FechaLimite${fechaIndex}" class="form-control fecha-limite" required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row habitaciones-container">
+                    `;
+
+                        // Generar tarjetas para cada habitación con su campo de precio
+                        $.each(habitaciones, function (index, habitacion) {
+                            fechaHtml += `
+                            <div class="col-md-4">
+                                <div class="card p-3 mb-3 shadow">
+                                    <h6 class="text-center fw-bold">${habitacion.nombre}</h6>
+                                    <input type="number" name="Precio${fechaIndex}_${habitacion.id}" class="form-control precio-habitacion mt-2" placeholder="Ingrese el precio" required />
+                                </div>
+                            </div>
+                        `;
+                        });
+
+                        fechaHtml += `</div></div>`;
+
+                        $("#fechasContainer").append(fechaHtml);
+                        console.log(`Fecha ${fechaIndex + 1} agregada con habitaciones.`);
+                    },
+                    error: function () {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Error al obtener las habitaciones.",
+                            icon: "error"
+                        });
+                    }
+                });
+            });
+
+
+            // Evento para generar el itinerario según la duración ingresada
+            $("#generarItinerario").click(function () {
+                var duracion = $("#Duracion").val();
+                var container = $("#itinerarioContainer");
+                container.empty();
+
+
+                // var buttonAgregar = `
+                //     <div class="mt-4 text-center">
+                //                                 <button type="button" class="btn btn-primary w-100" onclick="addItinerario()">Agregar Itinerario a Crucero</button>
+                //     </div>
+                // `;
+                // container.append(buttonAgregar);
+
+                for (var i = 1; i <= duracion; i++) {
+                    var html = `
+            <div class="border p-4 mt-4 mb-3 rounded bg-white shadow-sm">
+                <h5 class="text-secondary">Día ${i}</h5>
+                <div class="form-group">
+                    <label class="fw-bold">Descripción</label>
+                    <input type="text" name="itinerarios[${i - 1}].DescripcionDia" class="form-control" placeholder="Ingrese la descripción" required />
+                </div>
+                <div class="form-group mt-2">
+                    <label class="fw-bold">Día</label>
+                    <input type="number" name="itinerarios[${i - 1}].Dia" class="form-control" placeholder="Ingrese un número" required />
+                </div>
+                <div class="form-group mt-2">
+                    <label class="fw-bold">Seleccionar Puerto</label>
+                    <select name="itinerarios[${i - 1}].PuertoId" class="form-select" required>
+                                <option value="">Seleccione un puerto</option>
+                @foreach (var puerto in ViewBag.ListPuertos)
+                {
+                                        <option value="@puerto.Id">@puerto.Nombre</option>
+                }
+                            </select>
+                        </div>
+                    </div>
+                    `;
+                            container.append(html);
+                        }
+
+
+
+             
+               
+
+            });
+
+        });
+
+
+
+        function addItinerario() {
+           
+            let duracion = $("#Duracion").val();
+
+        
+            if (!$.isNumeric(duracion) || parseInt(duracion) <= 0) {
+                Swal.fire({
+                    title: "Error!",
+                    text: "Ingrese una duración válida mayor a cero!",
+                    icon: "error"
+                });
+                return;
+            }
+
+            console.log('Duracion:', duracion);
+            let itinerarios = [];
+
+         
+            for (let i = 1; i <= duracion; i++) {
+           
+                let descripcionDia = $(`input[name="itinerarios[${i - 1}].DescripcionDia"]`).val();
+                let dia = $(`input[name="itinerarios[${i - 1}].Dia"]`).val();
+                let puertoId = $(`select[name="itinerarios[${i - 1}].PuertoId"]`).val();
+
+                console.log('DescripcionDia:', descripcionDia);
+                console.log('Dia:', dia);
+                console.log('PuertoId:', puertoId);
+
+              
+                if (!descripcionDia || !dia || !puertoId) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `Por favor complete todos los campos para el Día ${i}`,
+                        icon: "error"
+                    });
+                    return; 
+                }
+
+            
+                itinerarios.push({
+                    Descripcion: descripcionDia,
+                    Dia: dia,
+                    Idpuerto: puertoId
+                });
+            }
+
+           
+            console.log("Itinerarios:", itinerarios);
+
+         
+            let itinerariosParams = itinerarios.map((itinerario, index) =>
+                `itinerarios[${index}].Descripcion=${encodeURIComponent(itinerario.Descripcion)}&itinerarios[${index}].Dia=${itinerario.Dia}&itinerarios[${index}].Idpuerto=${itinerario.Idpuerto}`
+            ).join('&');
+
+        
+            const myRequest = `@Url.Action("AddItinerario", "Crucero")?${itinerariosParams}`;
+
+           
+            fetch(myRequest, { method: 'GET' })
+                .then(function (response) {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text) });
+                    }
+                    return response.text();
+                })
+                .then((text) => {
+                    Swal.fire({
+                        title: "Éxito!",
+                        text: "Itinerarios agregados correctamente!",
+                        icon: "success"
+                    });
+
+                   
+                  
+                })
+                .catch(error => {
+                    console.error("❌ Error en la petición:", error);
+                    Swal.fire({
+                        title: "Error",
+                        text: error.message || "Hubo un problema al procesar la solicitud.",
+                        icon: "error"
+                    });
+                });
+        }
+
+
+
+
+        function addFechas() {
+            let fechas = [];
+            let fechaIndex = 0;
+
+            while ($(`input[name="FechaInicio${fechaIndex}"]`).length > 0) {
+                let fechaInicio = $(`input[name="FechaInicio${fechaIndex}"]`).val();
+                let fechaLimite = $(`input[name="FechaLimite${fechaIndex}"]`).val();
+                let habitacionesArray = [];
+
+                console.log(`Procesando Fecha ${fechaIndex + 1}: Inicio: ${fechaInicio}, Límite: ${fechaLimite}`);
+
+                if (!fechaInicio || !fechaLimite) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `Por favor complete las fechas para el bloque ${fechaIndex + 1}`,
+                        icon: "error"
+                    });
+                    return;
+                }
+
+                let errorEncontrado = false;
+
+                $(`input[name^="Precio${fechaIndex}_"]`).each(function () {
+                    let habitacionId = $(this).attr('name').split('_')[1];
+                    let precio = $(this).val();
+
+                    console.log(`Habitación ${habitacionId}: Precio ingresado: ${precio}`);
+
+                    if (!precio || isNaN(precio) || parseFloat(precio) <= 0) {
+                        Swal.fire({
+                            title: "Error!",
+                            text: `Ingrese un precio válido para la habitación ${habitacionId} en la Fecha ${fechaIndex + 1}`,
+                            icon: "error"
+                        });
+                        errorEncontrado = true;
+                        return false;
+                    }
+
+                    habitacionesArray.push({
+                        IdHabitacion: parseInt(habitacionId),
+                        Costo: parseFloat(precio)
+                    });
+                });
+
+                if (errorEncontrado) return;
+
+                fechas.push({
+                    FechaInicio: fechaInicio,
+                    FechaLimite: fechaLimite,
+                    PrecioHabitacion: habitacionesArray
+                });
+
+                fechaIndex++;
+            }
+
+            console.log("Fechas recopiladas:", fechas);
+
+            // Construir los parámetros correctamente
+            let fechasParams = fechas.map((fecha, index) => {
+                let habitacionesParams = fecha.PrecioHabitacion.map((habitacion, hIndex) =>
+                    `fechas[${index}].PrecioHabitacion[${hIndex}].IdHabitacion=${habitacion.IdHabitacion}&fechas[${index}].PrecioHabitacion[${hIndex}].Costo=${habitacion.Costo}`
+                ).join('&');
+
+                return `fechas[${index}].FechaInicio=${encodeURIComponent(fecha.FechaInicio)}&fechas[${index}].FechaLimite=${encodeURIComponent(fecha.FechaLimite)}&${habitacionesParams}`;
+            }).join('&');
+
+            const myRequest = `@Url.Action("AddFechas", "Crucero")?${fechasParams}`;
+
+            fetch(myRequest, { method: 'GET' })
+                .then(function (response) {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text) });
+                    }
+                    return response.text();
+                })
+                .then(() => {
+                    Swal.fire({
+                        title: "Éxito!",
+                        text: "Fechas agregadas correctamente!",
+                        icon: "success"
+                    });
+                })
+                .catch(error => {
+                    console.error("❌ Error en la petición:", error);
+                    Swal.fire({
+                        title: "Error",
+                        text: error.message || "Hubo un problema al procesar la solicitud.",
+                        icon: "error"
+                    });
+                });
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+   
+}

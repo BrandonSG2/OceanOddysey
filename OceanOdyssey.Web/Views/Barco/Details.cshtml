@@ -1,0 +1,50 @@
+﻿@model OceanOdyssey.Application.DTOs.BarcoDTO
+
+@{
+    ViewData["Title"] = "Details";
+}
+<h1 class="display-4 text-center my-4">Detalles del Barco</h1>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">Información del Barco</h3>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3 font-weight-bold">ID:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Id)</dd>
+
+                <dt class="col-sm-3 font-weight-bold">Nombre:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Nombre)</dd>
+
+                <dt class="col-sm-3 font-weight-bold">Capacidad:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Capacidad)</dd>
+
+                <dt class="col-sm-3 font-weight-bold">Descripción:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Descripcion)</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header bg-success text-white">
+            <h3 class="card-title">Habitaciones</h3>
+        </div>
+        <div class="card-body">
+            @foreach (var barcoHabitacion in Model.BarcoHabitacion)
+            {
+                <div class="border p-3 mb-3 rounded shadow-sm">
+                    <h5 class="font-weight-bold">Habitación: @barcoHabitacion.IdhabitacionNavigation!.Nombre</h5>
+                    <p><strong>Cantidad disponible:</strong> @barcoHabitacion.Cantidad</p>
+                    <p><strong>Detalles:</strong> @barcoHabitacion.IdhabitacionNavigation.Detalles</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="text-center my-4">
+       
+        <a asp-action="Index" class="btn btn-secondary btn-lg mx-2">Volver a la lista</a>
+    </div>
+</div>

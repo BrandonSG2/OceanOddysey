@@ -1,0 +1,74 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+}
+
+footer {
+    width: 100%;
+}
+
+
+.footer {
+    background: var(--bs-primary); 
+    color: white;
+    padding: 40px 0;
+    font-size: 16px;
+}
+
+    .footer a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+        .footer a:hover {
+            color: rgba(255, 255, 255, 1); 
+        }
+
+    .footer .social-icons a {
+        font-size: 20px;
+        margin: 0 10px;
+        display: inline-block;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+        .footer .social-icons a:hover {
+            color: #ffd700; 
+        }
+
+    .footer .footer-bottom {
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        margin-top: 20px;
+        padding-top: 15px;
+        font-size: 14px;
+    }
+

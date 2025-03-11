@@ -1,0 +1,163 @@
+﻿@model OceanOdyssey.Application.DTOs.ResumenReservacionDTO
+
+@{
+    ViewData["Title"] = "Detalles de la Reservación";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center mb-4">Detalles de la Reservación</h2>
+        <hr />
+
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <img src="~/images/logoFactura.png" alt="Imagen del Crucero" class="img-fluid rounded shadow">
+            </div>
+            <div class="col-md-8">
+                <div class="card p-3 mb-3">
+                    <h4 class="text-center">Información del Crucero</h4>
+                    <dl class="row">
+                        <dt class="col-sm-5">Nombre del Crucero:</dt>
+                        <dd class="col-sm-7">@Model.IdcruceroNavigation.Nombre</dd>
+
+                        <dt class="col-sm-5">Puerto de Salida:</dt>
+                        <dd class="col-sm-7">@Model.IdcruceroNavigation.Itinerario.FirstOrDefault()?.IdpuertoNavigation!.Nombre</dd>
+
+                        <dt class="col-sm-5">Puerto de Regreso:</dt>
+                        <dd class="col-sm-7">@Model.IdcruceroNavigation.Itinerario.LastOrDefault()?.IdpuertoNavigation!.Nombre</dd>
+
+                        <dt class="col-sm-5">Fecha de Inicio:</dt>
+                        <dd class="col-sm-7">@Model.FechaCruceroNavigation.FechaInicio.ToString("dd/MM/yyyy")</dd>
+
+                        <dt class="col-sm-5">Fecha de Fin:</dt>
+                        <dd class="col-sm-7">
+                            @(Model.FechaCruceroNavigation.FechaInicio.AddDays(Model.IdcruceroNavigation.Duracion).ToString("dd/MM/yyyy"))
+                        </dd>
+
+                    </dl>
+                </div>
+
+                <div class="card p-3">
+                    <h4 class="text-center">Información Financiera</h4>
+                    <dl class="row">
+                        <dt class="col-sm-5">Total por Habitaciones:</dt>
+                        <dd class="col-sm-7">$@Model.TotalHabitaciones.ToString("N2")</dd>
+
+                        <dt class="col-sm-5">Subtotal:</dt>
+                        <dd class="col-sm-7">$@Model.PrecioTotal.ToString("N2")</dd>
+
+                        <dt class="col-sm-5">Impuestos:</dt>
+                        <dd class="col-sm-7">$@Model.Impuestos.ToString("N2")</dd>
+
+                        <dt class="col-sm-5">Precio Total:</dt>
+                        <dd class="col-sm-7 text-success font-weight-bold">$@Model.TotalFinal.ToString("N2")</dd>
+
+                        <dt class="col-sm-5">Estado de Pago:</dt>
+                        <dd class="col-sm-7">
+                            <span class="badge @(Model.Estado == "Pagado" ? "bg-success" : "bg-warning")">
+                                @Model.Estado
+                            </span>
+                        </dd>
+
+                        @if (Model.Estado != "Pagado")
+                        {
+                            <dt class="col-sm-5">Fecha Máxima de Pago:</dt>
+                            <dd class="col-sm-7">
+                                @(Model.FechaCruceroNavigation.FechaInicio.AddDays(Model.IdcruceroNavigation.Duracion + 10).ToString("dd/MM/yyyy"))
+                            </dd>
+
+                            <dt class="col-sm-5">Monto a Cancelar:</dt>
+                            <dd class="col-sm-7 text-success font-weight-bold">
+                                $@Model.TotalFinal.ToString("N2")
+                            </dd>
+
+                        }
+
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-lg p-4 mt-4">
+        <h3 class="text-center mb-3">Detalles</h3>
+        <h4 class="mb-3">Habitaciones</h4>
+        <table class="table table-striped table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Detalles</th>
+                    <th>Precio</th>
+                    <th>Pasajeros</th>
+                    <th>Cantidad Habitaciones</th>
+                    <th>Total </th>
+                </tr>
+            </thead>
+            @{
+                var habitacionesAgrupadas = Model.ReservaHabitacion
+                .GroupBy(h => h.IdhabitacionNavigation!.Id)
+                .ToDictionary(g => g.Key, g => new
+                {
+                    Habitacion = g.First(),
+                    Cantidad = g.Count(),
+                    Total = g.Count() * g.First().IdhabitacionNavigation!.PrecioHabitacion.First().Costo
+                });
+            }
+
+            <tbody>
+                @foreach (var item in habitacionesAgrupadas)
+                {
+                    var habitacion = item.Value.Habitacion;
+                    var cantidad = item.Value.Cantidad;
+                    var total = item.Value.Total;
+
+                    <tr>
+                        <td class="fw-bold">@habitacion.IdhabitacionNavigation!.Nombre</td>
+                        <td>@habitacion.IdhabitacionNavigation.Detalles</td>
+                        <td>$@habitacion.IdhabitacionNavigation.PrecioHabitacion.First().Costo.ToString("N2")</td>
+                        <td>@string.Join(", ", habitacion.IdhabitacionNavigation.Pasajero.Select(p => p.Nombre))</td>
+                        <td>@cantidad</td>
+                        <td>$@total.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card shadow-lg p-4 mt-4">
+        <h4 class="mb-3">Complementos</h4>
+        <table class="table table-striped table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Detalles</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var complemento in Model.ReservaComplemento)
+                {
+                    var precio = complemento.IdcomplementoNavigation!.Precio ?? 0; // Manejo de nulos
+                    var cantidad = complemento.Cantidad;
+                    var total = precio * cantidad;
+
+                    <tr>
+                        <td class="fw-bold">@complemento.IdcomplementoNavigation!.Nombre</td>
+                        <td>@complemento.IdcomplementoNavigation.Detalle</td>
+                        <td>@cantidad</td>
+                        <td>@("$" + precio.ToString("N2"))</td>
+                        <td>@("$" + total.ToString("N2"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="text-center mt-4">
+       
+        <a class="btn btn-secondary" asp-action="Index">Regresar a la Lista</a>
+    </div>
+</div>

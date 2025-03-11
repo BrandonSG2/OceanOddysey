@@ -1,0 +1,52 @@
+﻿@model IEnumerable<OceanOdyssey.Application.DTOs.CruceroDTO>
+
+<div id="myCard">
+    <div class="card">
+        <div class="card-header">
+            Detalle de Habitaciones
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered text-center" id="detalleHabitaciones">
+                    <thead>
+                        <tr>
+                            <th>Nombre de la Habitación</th>
+                            <th>Precio de la Habitación</th>
+                            <th>Fecha de crucero</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null)
+                        {
+                            @foreach (var item in Model)
+                            {
+                                if (item.IdbarcoNavigation?.BarcoHabitacion != null)
+                                {
+                                    @foreach (var habitacion in item.IdbarcoNavigation.BarcoHabitacion)
+                                    {
+                                        if (habitacion.IdhabitacionNavigation != null)
+                                        {
+                                            <tr>
+                                                <td>@habitacion.IdhabitacionNavigation.Nombre</td>
+                                                <td>
+                                                    @if (habitacion.IdhabitacionNavigation.PrecioHabitacion != null && habitacion.IdhabitacionNavigation.PrecioHabitacion.Any())
+                                                    {
+                                                        @habitacion.IdhabitacionNavigation.PrecioHabitacion.First().Costo.ToString("C") <!-- Muestra el primer precio disponible -->
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">No disponible</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
