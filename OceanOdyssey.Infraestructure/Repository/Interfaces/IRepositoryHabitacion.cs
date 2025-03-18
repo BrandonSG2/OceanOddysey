@@ -12,7 +12,8 @@ namespace OceanOdyssey.Infraestructure.Repository.Interfaces
         Task<ICollection<Habitacion>> ListAsync();
         Task<Habitacion> FindByIdAsync(int id);
         Task<ICollection<Habitacion>> ObtenerHabitacionesPorBarcoAsync(int idBarco);
-
-
+        Task<int> AddAsync(Habitacion dto);
+        Task UpdateAsync(Habitacion entity);
+        
     }
 }

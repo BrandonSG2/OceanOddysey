@@ -23,12 +23,14 @@ builder.Services.AddTransient<IRepositoryHabitacion, RepositoryHabitacion>();
 builder.Services.AddTransient<IRepositoryResumenReservacion, RepositoryResumenReservacion>();
 builder.Services.AddTransient<IRepositoryCrucero, RepositoryCrucero>();
 builder.Services.AddTransient<IRepositoryPuerto, RepositoryPuerto>();
+builder.Services.AddTransient<IRepositoryBarcoHabitacion, RepositoryBarcoHabitacion>();
 //Services
 builder.Services.AddTransient<IServiceBarco, ServiceBarco>();
 builder.Services.AddTransient<IServiceHabitacion, ServiceHabitacion>();
 builder.Services.AddTransient<IServiceResumenReservacion, ServiceResumenReservacion>();
 builder.Services.AddTransient<IServiceCrucero, ServiceCrucero>();
 builder.Services.AddTransient<IServicePuerto , ServicePuerto>();
+builder.Services.AddTransient<IServiceBarcoHabitacion, ServiceBarcoHabitacion>();
 //Configurar Automapper
 builder.Services.AddAutoMapper(config =>
 {

@@ -49,7 +49,7 @@ namespace OceanOdyssey.Web.Controllers
 
         // GET: CruceroController/Create
         public async Task<IActionResult> Create()
-        {
+        { 
         
 
             ViewBag.ListBarco = await _serviceBarco.ListAsync();

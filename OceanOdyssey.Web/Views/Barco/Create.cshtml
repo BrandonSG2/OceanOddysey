@@ -1,0 +1,237 @@
+﻿@model OceanOdyssey.Application.DTOs.BarcoDTO
+@using System.Text.Json
+<style>
+    ul.ui-autocomplete {
+        z-index: 1100;
+    }
+</style>
+@{
+    ViewData["Title"] = "Create";
+}
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary text-center">Crear Nueva Habitacion</h2>
+    <hr />
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form asp-action="Create" 
+                  class="p-5 border rounded shadow-lg bg-light"
+                  enctype="multipart/form-data"
+                  data-ajax="true" 
+            data-ajax-method="POST"
+            data-ajax-begin="onBegin"
+            data-ajax-failure="onFailure"
+            data-ajax-success="onSuccess"
+            data-ajax-complete="onComplete">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group mb-3">
+                <label asp-for="Nombre" class="control-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Capacidad" class="control-label"></label>
+                <input asp-for="Capacidad" class="form-control" />
+                <span asp-validation-for="Capacidad" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Descripcion" class="control-label"></label>
+                <input asp-for="Descripcion" class="form-control" />
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="form-group row g-3">
+                    <div class="col">
+                        <label asp-for="BarcoHabitacion" class="form-label mt-4"></label>
+                    </div>
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#myModal" onclick="">Agregar Habitacion</button>
+                </div>
+                </div>
+                <div class="col-md-10">
+
+                    <!-- Detail View -->
+                    <div id="detalleOrdenView">
+                        <!-- Solamente se muestra la primera vez como efecto visual-->
+                        @await Html.PartialAsync("_DetailHabitaciones")
+                    </div>
+                </div>
+            <div class="form-group">
+                <input type="submit"  class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+    </div>
+</div>
+
+<div>
+    <a asp-action="IndexAdmin">Back to List</a>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Habitaciones</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Etiqueta mostrar donde se inyecta el partialview-->
+                <div id="mostrar" class=""></div>
+                @await Html.PartialAsync("_AddHabitacion")
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!------------------------------------ Fin Modal ----------------------------->
+@section Scripts {
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <script>
+        $(document).ready(function () {
+            /**************************/
+            // Autocomplete Modal Buscar Habitaciones
+            /**************************/
+            $("#IdNombreModal").autocomplete({
+                source: function (request, response) {
+                    var id = $("#IdNombreModal").val();
+                    console.log("Buscando: " + id);
+
+                    $("#HabitacionSelect").html("")
+                    $("#CantidadSelect").html("");
+                    $("#Cantidad").val("");
+
+                    $.ajax({
+                        type: "GET",
+                        url: '@Url.Action("GetHabitacionesByNombre", "Barco")',
+                        dataType: "json",
+                        data: { filtro: id },
+                        success: function (data) {
+                            console.log("Datos recibidos:", data);
+                            response($.map(data, function (item) {
+                                console.log(item);
+                                return { label: item.nombre.trim(), value: item.id };
+                            }));
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error en AJAX:", error);
+                            alert("Error: " + error + ", Status: " + xhr.status);
+                        },
+                    });
+                },
+                select: function (event, ui) {
+                    console.log("Seleccionado:", ui.item); 
+                    $("#IdNombreModal").val(ui.item.label);
+                    $("#HabitacionSelect").html("Habitación: " + ui.item.label);
+                    $("#Id").val(ui.item.value);
+                    console.log("Valor asignado a IdHabitacion:", $("#Id").val());
+                    event.preventDefault(); // Evita que el valor sea sobreescrito
+                    return false;
+                }
+            });
+        });
+        function addLibro() {
+            let idLibroModal = document.getElementById("Id").value;
+            console.log(idLibroModal);
+            let cantidadModal = document.getElementById("CantidadModal").value;
+            let detalleOrdenBorrar = document.getElementById("detalleHabitaciones");
+            let divOrden = document.getElementById("detalleOrdenView");
+            if (!$.isNumeric(idLibroModal)) {
+                Swal.fire("Error!", "Ingrese el código del Libro!", "error");
+                return;
+            }
+            if (!$.isNumeric(cantidadModal) || parseInt(cantidadModal) <= 0) {
+                Swal.fire("Error!", "Ingrese una cantidad válida!", "error");
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("AddLibro", "Barco")',
+                type: 'GET',
+                data: { id: idLibroModal, cantidad: cantidadModal },
+                success: function (data) {
+                    $("#detalleHabitaciones").html(data); // Actualizar la tabla
+                    $("#IdNombreModal").val("");
+                    $("#CantidadModal").val("");
+                },
+                error: function (xhr) {
+                    Swal.fire("Error!", xhr.responseText, "error");
+                }
+            });
+            $("#IdNombreModal").val("")
+            $("#CantidadModal").val("")
+            $("#HabitacionSelect").html("")
+            
+            $("#CantidadSelect").html("");
+            $("#Precio").val("");
+            $("#Cantidad").val("");
+            
+        }
+
+        /**************************/
+        // Eliminar de la compra
+        /**************************/
+
+        function deleteLibro(id) {
+            console.log("ID recibido en deleteLibro:", id); // Verifica si el ID llega correctamente
+
+            $.ajax({
+                url: '@Url.Action("DeleteLibro", "Barco")',
+                type: 'GET',
+                data: { idHabitacion: id },  // Asegúrate de que el nombre del parámetro coincide con el del controlador
+                success: function (data) {
+                    $("#detalleHabitaciones").html(data);
+                },
+                error: function (xhr) {
+                    Swal.fire("Error!", xhr.responseText, "error");
+                }
+            });
+        }
+        //Controles de AJAX
+        function onBegin() {
+            console.log("onBegin")
+        }
+
+        function onFailure(response) {
+            console.log("onFailure")
+            Swal.fire({
+                title: "Error!",
+                text: response.responseText,
+                icon: "error"
+            });
+        }
+
+        function onSuccess(response) {
+            console.log("onSuccess")
+            document.getElementById("myForm").reset();
+            document.getElementById("NombreCliente").innerHTML = ""
+            document.getElementById("detalleOrdenView").innerHTML = ""
+
+            Swal.fire({
+                icon: "success",
+                title: "Orden salvada ...",
+                showConfirmButton: false,
+                timer: 1500
+            });
+            location.reload();
+
+        }
+
+        function onComplete() {
+            console.log("Fin del proceso")
+        }
+        function onClearForm() {
+            document.getElementById("myForm").reset();
+            document.getElementById("NombreCliente").innerHTML = ""
+            document.getElementById("detalleOrdenView").innerHTML = ""
+
+        }
+    </script>
+    <script src="~/js/orden.js" asp-append-version="true"></script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
