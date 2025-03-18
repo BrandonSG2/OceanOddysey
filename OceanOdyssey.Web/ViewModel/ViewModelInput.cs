@@ -18,5 +18,6 @@ namespace OceanOdyssey.Web.ViewModels
 
         [Display(Name = "Habitacion")]
         public int IdHabitacion { get; set; }
+
     }
 }

@@ -1,0 +1,49 @@
+﻿@model OceanOdyssey.Web.ViewModels.ViewModelInputHabitacion
+<div class="row" id="MyAddLibro">
+    <div class="col-md-4">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+
+            <label asp-for="Nombre" name="Habitacion" class="control-label"></label>
+            <input asp-for="Nombre" id="IdNombreModal" type="text" autocomplete="off" class="form-control  form-control-sm" />
+            
+            <span asp-validation-for="Nombre" class="text-danger"></span>
+            <!--Hidden field with stock-->
+            <input type="hidden" id="CantidadEnInventarioModal" />
+            <input type="hidden" id="Id" name="Id">
+        </div>
+        <div class="form-group">
+            <label asp-for="Cantidad" class="control-label"></label>
+            <input asp-for="Cantidad" id="CantidadModal" type="number" class="form-control form-control-sm" />
+            <span asp-validation-for="Cantidad" class="text-danger"></span>
+        </div>
+       
+        <br />
+        <!--Call JavaScript addLibro -->
+        <button type="button" class="btn btn-success" onclick="addLibro()">Agregar Habitacion</button>
+    </div>
+    
+    <div class="col-md-4 text-left">
+       <p id="HabitacionSelect" name="HabitacionSelect" class="form-label fw-bold">Habitacion: -</p>
+     
+        <p id="CantidadSelect" name="CantidadSelect" class="form-label fw-bold">Cantidad Stodk: -</p>
+    </div>
+</div>
+
+
+
+
+<div>
+    <a asp-action="Create">Regresar a la Orden</a>
+</div>
+
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

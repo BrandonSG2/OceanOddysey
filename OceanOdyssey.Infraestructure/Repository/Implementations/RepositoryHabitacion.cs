@@ -46,7 +46,66 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                 .Where(h => h.BarcoHabitacion.Any(bh => bh.IdbarcoNavigation!.Id == idBarco)) 
                 .ToListAsync();
         }
+        
+        public async Task<int> AddAsync(Habitacion habitacionDto)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Crear el objeto habitacion
+                var habitacion = new Habitacion
+                {
+                    Nombre = habitacionDto.Nombre,
+                    Detalles = habitacionDto.Detalles,
+                    CapacidadMaxima = habitacionDto.CapacidadMaxima,
+                    CapacidadMinima = habitacionDto.CapacidadMinima,
+                    Tamanno = habitacionDto.Tamanno,
+                };
 
+
+                _context.Habitacion.Add(habitacion);
+                await _context.SaveChangesAsync();
+
+
+                
+
+
+                await transaction.CommitAsync();
+                return habitacion.Id;
+            }
+            catch (Exception)
+            {
+
+                await transaction.RollbackAsync();
+                return -1;
+            }
+        }
+        public async Task UpdateAsync(Habitacion entity)
+        {
+            
+                if (entity == null)
+                    throw new ArgumentNullException(nameof(entity));
+
+                var habitacionExistente = await _context.Habitacion.FindAsync(entity.Id);
+
+                if (habitacionExistente == null)
+                    throw new KeyNotFoundException("No se encontró la habitación con el ID especificado.");
+
+                // Actualizar las propiedades manualmente
+                habitacionExistente.Nombre = entity.Nombre;
+                habitacionExistente.Detalles = entity.Detalles;
+                habitacionExistente.CapacidadMaxima = entity.CapacidadMaxima;
+                habitacionExistente.CapacidadMinima = entity.CapacidadMinima;
+                habitacionExistente.Tamanno = entity.Tamanno;
+
+                // Guardar cambios
+                await _context.SaveChangesAsync();
+            
+            //Las relaciones a actualizar depende de la consulta utilizada en el servicio
+            //Relación de muchos a muchos solo con llave primaria compuesta
+            await _context.SaveChangesAsync();
+        }
+        
 
     }
 }

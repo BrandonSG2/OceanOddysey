@@ -31,7 +31,18 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
 
             return @object!;
         }
+        public async Task EliminarRelacionesHabitaciones(int idBarco)
+        {
+            var barco = await _context.Barco
+                .Include(b => b.BarcoHabitacion)
+                .FirstOrDefaultAsync(b => b.Id == idBarco);
 
+            if (barco != null && barco.BarcoHabitacion.Any())
+            {
+                _context.BarcoHabitacion.RemoveRange(barco.BarcoHabitacion);
+                await _context.SaveChangesAsync();
+            }
+        }
         public async Task<ICollection<Barco>> ListAsync()
         {
             // select * from barco
@@ -66,7 +77,59 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
 
            
         }
+        public async Task<ICollection<Habitacion>> FindByNameAsync(string nombre)
+        {
+            var collection = await _context
+                                         .Set<Habitacion>()
+                                         .Where(p => p.Nombre.Contains(nombre))
+                                         .ToListAsync();
+            return collection;
+        }
 
+        public async Task<int> AddAsync(Barco barcodto)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                
+                _context.Barco.Add(barcodto);
+                await _context.SaveChangesAsync(); 
 
+                await transaction.CommitAsync();
+                return barcodto.Id; 
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return -1; // Indica que ocurrió un error
+            }
+        }
+        public async Task UpdateAsync(Barco entity)
+        {
+
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            var habitacionExistente = await _context.Habitacion.FindAsync(entity.Id);
+
+            if (habitacionExistente == null)
+                throw new KeyNotFoundException("No se encontró la habitación con el ID especificado.");
+
+            // Actualizar las propiedades manualmente
+
+            _context.Barco.Update(entity); // Asegura que el barco está en el contexto
+
+            // Agregar nuevas relaciones a BarcoHabitacion
+            if (entity.BarcoHabitacion != null && entity.BarcoHabitacion.Any())
+            {
+                _context.BarcoHabitacion.AddRange(entity.BarcoHabitacion);
+            }
+            // Guardar cambios
+            await _context.SaveChangesAsync();
+
+            //Las relaciones a actualizar depende de la consulta utilizada en el servicio
+            //Relación de muchos a muchos solo con llave primaria compuesta
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -1,14 +1,9 @@
-﻿using OceanOdyssey.Infraestructure.Models;
-using System;
-using System.Collections.Generic;
+﻿using OceanOdyssey.Application.DTOs;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OceanOdyssey.Application.DTOs
+namespace OceanOdyssey.Web.ViewModels
 {
-    public record HabitacionDTO
+    public class ViewModelInputHabitacion
     {
         public int Id { get; set; }
 
@@ -42,5 +37,11 @@ namespace OceanOdyssey.Application.DTOs
         public virtual List<PrecioHabitacionDTO> PrecioHabitacion { get; set; } = null!;
 
         public virtual List<ReservaHabitacionDTO> ReservaHabitacion { get; set; } = null!;
+
+        [Display(Name = "Cantidad")]
+        [Range(0, 600, ErrorMessage = "El valor mínimo es {0}")]
+        [Required(ErrorMessage = "{0} es un dato requerido")]
+        public int? Cantidad { get; set; }
+
     }
 }
