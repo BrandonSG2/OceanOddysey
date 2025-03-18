@@ -139,7 +139,7 @@ namespace OceanOdyssey.Web.Controllers
             // Llamar al servicio para agregar el crucero junto con los itinerarios y las fechas asociadas
             await _serviceCrucero.AddAsync(cruceroDTO);
 
-            // Redirigir a la página de listado o índice
+       
             return RedirectToAction("Index");
         }
 
