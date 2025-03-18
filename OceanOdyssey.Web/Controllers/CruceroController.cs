@@ -49,8 +49,8 @@ namespace OceanOdyssey.Web.Controllers
 
         // GET: CruceroController/Create
         public async Task<IActionResult> Create()
-        { 
-        
+        {
+
 
             ViewBag.ListBarco = await _serviceBarco.ListAsync();
             ViewBag.ListHabitaciones = await _serviceHabitacion.ListAsync();
@@ -90,7 +90,8 @@ namespace OceanOdyssey.Web.Controllers
                 return BadRequest("Barco no existe");
             }
 
-         
+
+
 
             // Si no se proporcionó una imagen, pero se subió un archivo de imagen
             if (cruceroDTO.Imagen == null)
@@ -115,7 +116,7 @@ namespace OceanOdyssey.Web.Controllers
 
                 if (itinerarios != null && itinerarios.Any())
                 {
-                  
+
                     cruceroDTO.Itinerario = itinerarios;
 
                     itinerarios.ForEach(i => i.Idcrucero = cruceroDTO.Id);
@@ -130,7 +131,7 @@ namespace OceanOdyssey.Web.Controllers
 
                 if (fechas != null && fechas.Any())
                 {
-                   
+
                     cruceroDTO.FechaCrucero = fechas;
                 }
             }
@@ -207,31 +208,31 @@ namespace OceanOdyssey.Web.Controllers
                 listaItinerarios = new List<ItinerarioDTO>();
             }
 
-        
+
             foreach (var itinerario in itinerarios)
             {
-            
+
                 var existingItinerario = listaItinerarios.FirstOrDefault(i => i.Dia == itinerario.Dia);
 
                 if (existingItinerario != null)
                 {
-                    
+
                     existingItinerario.Descripcion = itinerario.Descripcion;
                     existingItinerario.Idpuerto = itinerario.Idpuerto;
                 }
                 else
                 {
-                   
+
                     listaItinerarios.Add(itinerario);
                 }
             }
 
-         
+
             json = JsonSerializer.Serialize(listaItinerarios);
 
             TempData["ItinerarioList"] = json;
 
-           
+
             TempData.Keep();
 
             await Task.CompletedTask;
@@ -256,7 +257,7 @@ namespace OceanOdyssey.Web.Controllers
                 }
             }
 
-          
+
 
             foreach (var fechaDto in fechas)
             {
@@ -272,7 +273,7 @@ namespace OceanOdyssey.Web.Controllers
                 }
             }
 
-         
+
 
             // Guardar la lista en TempData
             TempData["ListaFechas"] = JsonSerializer.Serialize(listaFechas);

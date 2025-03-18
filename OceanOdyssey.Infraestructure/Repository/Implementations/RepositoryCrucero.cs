@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace OceanOdyssey.Infraestructure.Repository.Implementations
 {
-    public class RepositoryCrucero:IRepositoryCrucero
+    public class RepositoryCrucero : IRepositoryCrucero
     {
         private readonly OceanOdysseyContext _context;
 
@@ -23,8 +23,8 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
 
             var @object = await _context.Set<Crucero>()
                 .Include(barcocrucero => barcocrucero.IdbarcoNavigation)
-                    .ThenInclude(barcohabitacion=>barcohabitacion.BarcoHabitacion)
-                     .ThenInclude(habitacion=>habitacion.IdhabitacionNavigation)
+                    .ThenInclude(barcohabitacion => barcohabitacion.BarcoHabitacion)
+                     .ThenInclude(habitacion => habitacion.IdhabitacionNavigation)
                       .ThenInclude(habitacionPrecio => habitacionPrecio!.PrecioHabitacion)
                 .Include(FechaCrucero => FechaCrucero.FechaCrucero)
                 .Include(ItinerarioCrucero => ItinerarioCrucero.Itinerario)
@@ -69,28 +69,28 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                     Disponible = cruceroDto.Disponible,
                 };
 
-               
-                _context.Crucero.Add(crucero);
-                await _context.SaveChangesAsync();  
 
-              
+                _context.Crucero.Add(crucero);
+                await _context.SaveChangesAsync();
+
+
                 if (cruceroDto.Itinerario != null && cruceroDto.Itinerario.Any())
                 {
-                   
+
                     var itinerarios = cruceroDto.Itinerario.Select(it => new Itinerario
                     {
-                        Idcrucero = crucero.Id,   
-                        Idpuerto = it.Idpuerto,  
+                        Idcrucero = crucero.Id,
+                        Idpuerto = it.Idpuerto,
                         Descripcion = it.Descripcion,
                         Dia = it.Dia
                     }).ToList();
 
-                 
+
                     _context.Itinerario.AddRange(itinerarios);
-                    await _context.SaveChangesAsync();  
+                    await _context.SaveChangesAsync();
                 }
 
-              
+
                 if (cruceroDto.FechaCrucero != null && cruceroDto.FechaCrucero.Any())
                 {
                     foreach (var fecha in cruceroDto.FechaCrucero)
@@ -99,13 +99,13 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                         {
                             Idcrucero = crucero.Id,
                             FechaInicio = fecha.FechaInicio,
-                           // FechaLimite = fecha.FechaLimite
+                            // FechaLimite = fecha.FechaLimite
                         };
 
                         _context.FechaCrucero.Add(fechaCrucero);
                         await _context.SaveChangesAsync();
 
-                       
+
                         if (fecha.PrecioHabitacion != null && fecha.PrecioHabitacion.Any())
                         {
                             var precios = fecha.PrecioHabitacion.Select(hab => new PrecioHabitacion
@@ -121,15 +121,15 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                     }
                 }
 
-           
+
                 await transaction.CommitAsync();
                 return crucero.Id;
             }
             catch (Exception)
             {
-               
+
                 await transaction.RollbackAsync();
-                return -1; 
+                return -1;
             }
         }
 
