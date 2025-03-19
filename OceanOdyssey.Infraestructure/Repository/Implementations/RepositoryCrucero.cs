@@ -59,7 +59,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Crear el objeto Crucero
+           
                 var crucero = new Crucero
                 {
                     Nombre = cruceroDto.Nombre,

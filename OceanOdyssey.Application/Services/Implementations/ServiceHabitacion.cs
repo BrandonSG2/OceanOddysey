@@ -65,20 +65,18 @@ namespace OceanOdyssey.Application.Services.Implementations
         }
         public async Task<int> AddAsync(HabitacionDTO dto)
         {
-            // Mapear el DTO de Crucero a la entidad Crucero
+          
             var habitacionmapped = _mapper.Map<Habitacion>(dto);
+  
 
-            // Mapear los itinerarios de DTO a entidades
-
-
-            // Llamar al repositorio para agregar el crucero, pasando el itinerario mapeado como una lista de objetos Itinerario
+         
             return await _repository.AddAsync(habitacionmapped);
         }
         public async Task UpdateAsync(int id, HabitacionDTO dto)
         {
-            //Obtenga el modelo original a actualizar
+           
             var @object = await _repository.FindByIdAsync(id);
-            //       source, destination
+         
             var entity = _mapper.Map(dto, @object!);
             await _repository.UpdateAsync(entity);
         }

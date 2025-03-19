@@ -101,7 +101,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             catch (Exception)
             {
                 await transaction.RollbackAsync();
-                return -1; // Indica que ocurrió un error
+                return -1; 
             }
         }
         public async Task UpdateAsync(Barco entity)
@@ -115,20 +115,19 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             if (habitacionExistente == null)
                 throw new KeyNotFoundException("No se encontró la habitación con el ID especificado.");
 
-            // Actualizar las propiedades manualmente
+           
 
-            _context.Barco.Update(entity); // Asegura que el barco está en el contexto
+            _context.Barco.Update(entity); 
 
-            // Agregar nuevas relaciones a BarcoHabitacion
+          
             if (entity.BarcoHabitacion != null && entity.BarcoHabitacion.Any())
             {
                 _context.BarcoHabitacion.AddRange(entity.BarcoHabitacion);
             }
-            // Guardar cambios
+            
             await _context.SaveChangesAsync();
 
-            //Las relaciones a actualizar depende de la consulta utilizada en el servicio
-            //Relación de muchos a muchos solo con llave primaria compuesta
+            
             await _context.SaveChangesAsync();
         }
     }

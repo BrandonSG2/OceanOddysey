@@ -17,7 +17,7 @@ namespace OceanOdyssey.Web.Controllers
         }
         public async Task<ActionResult> Index()
         {
-            //Recibir el mensaje de TempData
+          
            
             var collection=await _serviceHabitacion.ListAsync();
             return View(collection);
@@ -56,12 +56,12 @@ namespace OceanOdyssey.Web.Controllers
                 
                 var habi = await _serviceHabitacion.FindByIdAsync(habitacionDTO.Id);
                 var habitaciones= await _serviceHabitacion.ListAsync();
-            // Verificar si el barco existe
+           
             var existeNombre = await _serviceHabitacion.ExisteNombreAsync(habitacionDTO.Nombre);
             if (existeNombre)
             {
                 ModelState.AddModelError("Nombre", "El nombre de la habitación ya está registrado. Elige otro.");
-                return View(habitacionDTO); // Mantiene los datos ingresados en el formulario
+                return View(habitacionDTO); 
             }
 
             if (habi != null)
@@ -82,13 +82,13 @@ namespace OceanOdyssey.Web.Controllers
         public async Task<IActionResult> ValidarNombre(string nombre)
         {
             var existe = await _serviceHabitacion.ExisteNombreAsync(nombre);
-            return Json(existe); // Devuelve true si el nombre ya existe, false si es único
+            return Json(existe);
         }
         [HttpGet]
         public async Task<IActionResult> ValidarNombreAct(string nombre, int id)
         {
             var existe = await _serviceHabitacion.ExisteNombreActAsync(nombre,id);
-            return Json(existe); // Devuelve true si el nombre ya existe, false si es único
+            return Json(existe); 
         }
         // GET: HabitacionController/Edit/5
 
@@ -108,7 +108,7 @@ namespace OceanOdyssey.Web.Controllers
             if (existeNombre)
             {
                 ModelState.AddModelError("Nombre", "El nombre de la habitación ya está registrado. Elige otro.");
-                return View(dto); // Mantiene los datos ingresados en el formulario
+                return View(dto);
             }
             await _serviceHabitacion.UpdateAsync(id, dto);
                 TempData["Mensaje"] = Util.SweetAlertHelper.Mensaje(

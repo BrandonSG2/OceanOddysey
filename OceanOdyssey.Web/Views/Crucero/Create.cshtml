@@ -76,7 +76,7 @@
 
                     </div> *@
 
-                    <!-- Contenedor donde se agregarán las fechas y habitaciones -->
+                 
                     <div id="fechasContainer"></div>
                 </div>
 
@@ -138,7 +138,7 @@
                     type: 'GET',
                     data: { idBarco: barcoId },
                     success: function (habitaciones) {
-                        // Obtener correctamente el índice basado en la cantidad de fechas actuales
+                        
                         var fechaIndex = $("#fechasContainer .fecha-item").length;
 
                         var fechaHtml = `
@@ -161,7 +161,7 @@
                                     <div class="row habitaciones-container">
                             `;
 
-                        // Generar tarjetas para cada habitación con su campo de precio
+                        
                         $.each(habitaciones, function (index, habitacion) {
                             fechaHtml += `
                                     <div class="col-md-4">
@@ -189,15 +189,15 @@
             });
 
 
-            // Evento para generar el itinerario según la duración ingresada
+         
             $("#generarItinerario").click(function () {
                 var duracion = $("#Duracion").val();
                 var container = $("#itinerarioContainer");
                 container.empty();
 
 
-                // Validar que la duración sea un número positivo y no contenga letras
-                if (!/^\d+$/.test(duracion) || parseInt(duracion) <= 2) {
+               
+                if (!/^\d+$/.test(duracion) || parseInt(duracion) <= 1) {
                     Swal.fire({
                         title: "Error!",
                         text: "Ingrese al menos 2 o más dias para el itineraio !",
@@ -205,7 +205,7 @@
                     });
                     return;
                 }
-
+                    
                 // var buttonAgregar = `
                 //     <div class="mt-4 text-center">
                 //                                 <button type="button" class="btn btn-primary w-100" onclick="addItinerario()">Agregar Itinerario a Crucero</button>

@@ -80,22 +80,22 @@ namespace OceanOdyssey.Web.Controllers
                 json = (string)TempData["BarcoCreate"]!;
                 lista = JsonSerializer.Deserialize<List<BarcoHabitacionDTO>>(json!)!;
 
-                // Buscar el elemento por su ID
+              
                 var habitacion = lista.FirstOrDefault(h => h.Idhabitacion == idHabitacion);
                 if (habitacion != null)
                 {
                     if (habitacion.Cantidad > 1)
                     {
-                        // Si la cantidad es mayor a 1, restamos 1
+                       
                         habitacion.Cantidad--;
                     }
                     else
                     {
-                        // Si la cantidad es 1, eliminamos el objeto de la lista
+                       
                         lista.Remove(habitacion);
                     }
 
-                    // Serializar la lista y actualizar TempData
+               
                     json = JsonSerializer.Serialize(lista);
                     TempData["BarcoCreate"] = json;
                 }
@@ -121,11 +121,11 @@ namespace OceanOdyssey.Web.Controllers
             detalle.Idhabitacion = habitacion.Id;
             detalle.IdhabitacionNavigation = habitacion;
 
-            // Verificar si estamos editando un barco
+           
             int? idBarco = TempData["IdBarcoEditando"] as int?;
             if (idBarco != null)
             {
-                detalle.Idbarco = idBarco; // Solo asignamos el ID si existe
+                detalle.Idbarco = idBarco; 
             }
 
             if (TempData["BarcoCreate"] != null)
@@ -165,7 +165,7 @@ namespace OceanOdyssey.Web.Controllers
                 return View(barcoDTO);
             }
 
-            // Verificar si el nombre del barco ya existe
+            
             var existeNombre = await _serviceBarco.ExisteNombreAsync(barcoDTO.Nombre);
             if (existeNombre)
             {
@@ -173,7 +173,7 @@ namespace OceanOdyssey.Web.Controllers
                 return View(barcoDTO);
             }
 
-            // Obtener la lista de habitaciones desde TempData
+            
             List<BarcoHabitacionDTO> habitaciones = new();
             if (TempData["BarcoCreate"] != null)
             {
@@ -185,17 +185,16 @@ namespace OceanOdyssey.Web.Controllers
                 ModelState.AddModelError("BarcoHabitacion", "Debe seleccionar al menos una habitación.");
                 return View(barcoDTO);
             }
-            // Verificar si hay habitaciones para asociarlas al barco
+         
             if (habitaciones.Any())
             {
-                // Se asignan las habitaciones al barco
                 barcoDTO.BarcoHabitacion = habitaciones;
 
-                // Se asigna el ID del barco a cada habitación (esto es útil si es necesario en la BD)
+               
                 habitaciones.ForEach(h => h.Idbarco = barcoDTO.id);
             }
 
-            // Intentar guardar en la base de datos
+         
             var barcoId = await _serviceBarco.AddAsync(barcoDTO);
             if (barcoId <= 0)
             {
@@ -210,7 +209,7 @@ namespace OceanOdyssey.Web.Controllers
                 Util.SweetAlertMessageType.success
             );
 
-            return RedirectToAction("IndexAdmin"); // Redirigir tras el éxito
+            return RedirectToAction("IndexAdmin"); 
         }
 
         // GET: BarcoController/Edit/5
@@ -241,20 +240,18 @@ namespace OceanOdyssey.Web.Controllers
                 }).ToList()
             };
 
-            // Guardar habitaciones en TempData si no existen
+           
             if (TempData["BarcoCreate"] == null)
             {
                 string json = JsonSerializer.Serialize(barcoDTO.BarcoHabitacion);
                 TempData["BarcoCreate"] = json;
             }
 
-            TempData.Keep("BarcoCreate"); // Mantener datos en TempData
+            TempData.Keep("BarcoCreate"); 
 
             return View(barcoDTO);
 
 
-            // ✅ Ahora la vi
-            // Crear objetos BarcoHabitacionDTO a partir de las habitaciones obtenidas
 
         }
 
@@ -292,7 +289,7 @@ namespace OceanOdyssey.Web.Controllers
                 }
             }
 
-            // Guardar cambios
+      
             await _serviceBarco.UpdateAsync(id, dto);
 
             TempData["Mensaje"] = Util.SweetAlertHelper.Mensaje(
@@ -312,7 +309,7 @@ namespace OceanOdyssey.Web.Controllers
         {
 
             var collection = await _serviceBarco.FindByNameAsync(filtro);
-            Console.WriteLine(JsonSerializer.Serialize(collection)); // Ver en Output de la consola
+            Console.WriteLine(JsonSerializer.Serialize(collection)); 
             return Json(collection);
 
         }
@@ -321,7 +318,7 @@ namespace OceanOdyssey.Web.Controllers
             var listahabitaciones = new List<BarcoHabitacionDTO>();
             string json = "";
 
-            // Verifica si "ItinerarioList" existe en TempData
+         
             if (TempData["BarcoCreate"] != null)
             {
                 json = (string)TempData["BarcoCreate"]!;
@@ -329,7 +326,7 @@ namespace OceanOdyssey.Web.Controllers
             }
             else
             {
-                // Si no existe, inicializa la lista vacía
+                
                 listahabitaciones = new List<BarcoHabitacionDTO>();
             }
 

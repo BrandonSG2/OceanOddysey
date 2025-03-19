@@ -80,10 +80,10 @@ namespace OceanOdyssey.Web.Controllers
         {
             MemoryStream target = new MemoryStream();
 
-            // Buscar el barco correspondiente
+          
             var barco = await _serviceBarco.FindByIdAsync(cruceroDTO.Idbarco);
 
-            // Verificar si el barco existe
+          
             if (barco == null)
             {
                 TempData.Keep();
@@ -93,7 +93,7 @@ namespace OceanOdyssey.Web.Controllers
 
 
 
-            // Si no se proporcionó una imagen, pero se subió un archivo de imagen
+          
             if (cruceroDTO.Imagen == null)
             {
                 if (imageFile != null)
@@ -105,10 +105,10 @@ namespace OceanOdyssey.Web.Controllers
                 }
             }
 
-            // Establecer la relación entre el barco y el crucero
+         
             cruceroDTO.IdbarcoNavigation = barco;
 
-            // Deserializar los itinerarios desde TempData si están disponibles
+          
             if (TempData["ItinerarioList"] != null)
             {
                 string json = (string)TempData["ItinerarioList"];
@@ -123,7 +123,7 @@ namespace OceanOdyssey.Web.Controllers
                 }
             }
 
-            // Recuperar las fechas desde TempData
+         
             if (TempData["ListaFechas"] != null)
             {
                 string jsonFechas = (string)TempData["ListaFechas"];
@@ -136,7 +136,7 @@ namespace OceanOdyssey.Web.Controllers
                 }
             }
 
-            // Llamar al servicio para agregar el crucero junto con los itinerarios y las fechas asociadas
+           
             await _serviceCrucero.AddAsync(cruceroDTO);
 
        
@@ -196,7 +196,7 @@ namespace OceanOdyssey.Web.Controllers
             var listaItinerarios = new List<ItinerarioDTO>();
             string json = "";
 
-            // Verifica si "ItinerarioList" existe en TempData
+          
             if (TempData["ItinerarioList"] != null)
             {
                 json = (string)TempData["ItinerarioList"]!;
@@ -204,7 +204,7 @@ namespace OceanOdyssey.Web.Controllers
             }
             else
             {
-                // Si no existe, inicializa la lista vacía
+              
                 listaItinerarios = new List<ItinerarioDTO>();
             }
 
@@ -247,7 +247,7 @@ namespace OceanOdyssey.Web.Controllers
         {
             List<FechaCruceroDTO> listaFechas = new List<FechaCruceroDTO>();
 
-            // Solo cargar TempData si hay datos previos
+           
             if (TempData["ListaFechas"] != null)
             {
                 string json = (string)TempData["ListaFechas"]!;
@@ -261,7 +261,7 @@ namespace OceanOdyssey.Web.Controllers
 
             foreach (var fechaDto in fechas)
             {
-                // Si la fecha ya existe, evitar duplicados
+             
                 if (!listaFechas.Any(f => f.FechaInicio == fechaDto.FechaInicio))
                 {
                     listaFechas.Add(new FechaCruceroDTO
@@ -275,7 +275,6 @@ namespace OceanOdyssey.Web.Controllers
 
 
 
-            // Guardar la lista en TempData
             TempData["ListaFechas"] = JsonSerializer.Serialize(listaFechas);
             TempData.Keep();
             await Task.CompletedTask;

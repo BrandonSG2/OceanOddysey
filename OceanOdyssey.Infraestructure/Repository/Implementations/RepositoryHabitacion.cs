@@ -52,7 +52,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Crear el objeto habitacion
+               
                 var habitacion = new Habitacion
                 {
                     Nombre = habitacionDto.Nombre,
@@ -91,18 +91,17 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                 if (habitacionExistente == null)
                     throw new KeyNotFoundException("No se encontró la habitación con el ID especificado.");
 
-                // Actualizar las propiedades manualmente
+            
                 habitacionExistente.Nombre = entity.Nombre;
                 habitacionExistente.Detalles = entity.Detalles;
                 habitacionExistente.CapacidadMaxima = entity.CapacidadMaxima;
                 habitacionExistente.CapacidadMinima = entity.CapacidadMinima;
                 habitacionExistente.Tamanno = entity.Tamanno;
 
-                // Guardar cambios
+              
                 await _context.SaveChangesAsync();
             
-            //Las relaciones a actualizar depende de la consulta utilizada en el servicio
-            //Relación de muchos a muchos solo con llave primaria compuesta
+          
             await _context.SaveChangesAsync();
         }
         
