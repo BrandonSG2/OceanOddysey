@@ -66,10 +66,10 @@ namespace OceanOdyssey.Application.Services.Implementations
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto), "El DTO no puede ser nulo");
 
-            // Mapear el DTO a la entidad Barco
+          
             var barco = _mapper.Map<Barco>(dto);
 
-            // Asegurar que las relaciones se establecen correctamente
+           
             if (dto.BarcoHabitacion != null && dto.BarcoHabitacion.Any())
             {
                 barco.BarcoHabitacion = dto.BarcoHabitacion.Select(bh => new BarcoHabitacion
@@ -80,7 +80,6 @@ namespace OceanOdyssey.Application.Services.Implementations
                 }).ToList();
             }
 
-            // Guardar en la base de datos
             return await _repository.AddAsync(barco);
         }
         public async Task<ICollection<HabitacionDTO>> FindByNameAsync(string nombre)
@@ -100,13 +99,13 @@ namespace OceanOdyssey.Application.Services.Implementations
                 throw new Exception("El barco no existe.");
             }
 
-            // Eliminar relaciones actuales en BarcoHabitacion
+        
             await _repository.EliminarRelacionesHabitaciones(id);
 
-            // Mapear DTO a entidad sin afectar la navegación de habitaciones
+           
             _mapper.Map(dto, barco);
 
-            // Si hay nuevas habitaciones, las agregamos
+         
             if (dto.BarcoHabitacion != null && dto.BarcoHabitacion.Any())
             {
                 barco.BarcoHabitacion = dto.BarcoHabitacion.Select(h => new BarcoHabitacion
@@ -117,7 +116,7 @@ namespace OceanOdyssey.Application.Services.Implementations
                 }).ToList();
             }
 
-            // Guardar cambios en la base de datos
+         
             await _repository.UpdateAsync(barco);
         }
 
