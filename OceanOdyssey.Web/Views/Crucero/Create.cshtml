@@ -270,7 +270,7 @@
                     let dia = $(`input[name="itinerarios[${i - 1}].Dia"]`).val();
                     let puertoId = $(`select[name="itinerarios[${i - 1}].PuertoId"]`).val();
 
-                    // Validación de Día: Solo números positivos
+              
                     if (!/^\d+$/.test(dia) || parseInt(dia) <= 0) {
                         Swal.fire({
                             title: "Error!",
@@ -280,7 +280,7 @@
                         return reject(`Día inválido en el día ${i}`);
                     }
 
-                    // Validación de Descripción: No vacía y mínimo 5 caracteres
+          
                     if (!descripcionDia || descripcionDia.length < 5) {
                         Swal.fire({
                             title: "Error!",
@@ -290,7 +290,7 @@
                         return reject(`Descripción inválida en el día ${i}`);
                     }
 
-                    // Validación de Puerto seleccionado
+                    
                     if (!puertoId) {
                         Swal.fire({
                             title: "Error!",
@@ -307,14 +307,14 @@
                     });
                 }
 
-                // Validación: No permitir guardar si no hay al menos un itinerario
-                if (itinerarios.length === 0) {
+               
+                if (itinerarios.length < 2) {
                     Swal.fire({
                         title: "Error!",
-                        text: "Debe ingresar al menos un itinerario antes de continuar.",
+                        text: "Debe ingresar al menos dos itinerarios antes de continuar.",
                         icon: "error"
                     });
-                    return reject("No hay itinerarios ingresados.");
+                    return reject("No hay suficientes itinerarios ingresados.");
                 }
 
                 let params = itinerarios.map((it, index) =>
@@ -332,7 +332,6 @@
                     })
                     .then(data => {
                         console.log("✅ Itinerario guardado correctamente:", data);
-                       
                         resolve(data);
                     })
                     .catch(error => {
@@ -346,6 +345,7 @@
                     });
             });
         }
+
 
 
 
