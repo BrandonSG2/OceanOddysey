@@ -197,10 +197,10 @@
 
 
                 // Validar que la duración sea un número positivo y no contenga letras
-                if (!/^\d+$/.test(duracion) || parseInt(duracion) <= 0) {
+                if (!/^\d+$/.test(duracion) || parseInt(duracion) <= 2) {
                     Swal.fire({
                         title: "Error!",
-                        text: "Ingrese una duración válida mayor a cero!",
+                        text: "Ingrese al menos 2 o más dias para el itineraio !",
                         icon: "error"
                     });
                     return;
