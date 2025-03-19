@@ -71,10 +71,10 @@
 
                     <button type="button" class="btn btn-warning w-100 mb-3" id="agregarFecha">Agregar Nueva Fecha</button>
 
-                    <div class="mt-4 text-center">
+               @*      <div class="mt-4 text-center">
                         <button type="button" class="btn btn-primary w-100" onclick="addFechas()">Agregar Fechas a Crucero</button>
 
-                    </div>
+                    </div> *@
 
                     <!-- Contenedor donde se agregarán las fechas y habitaciones -->
                     <div id="fechasContainer"></div>
@@ -195,6 +195,16 @@
                 var container = $("#itinerarioContainer");
                 container.empty();
 
+
+                // Validar que la duración sea un número positivo y no contenga letras
+                if (!/^\d+$/.test(duracion) || parseInt(duracion) <= 0) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Ingrese una duración válida mayor a cero!",
+                        icon: "error"
+                    });
+                    return;
+                }
 
                 // var buttonAgregar = `
                 //     <div class="mt-4 text-center">
@@ -322,11 +332,7 @@
                     })
                     .then(data => {
                         console.log("✅ Itinerario guardado correctamente:", data);
-                        Swal.fire({
-                            title: "Éxito!",
-                            text: "El itinerario se ha guardado correctamente.",
-                            icon: "success"
-                        });
+                       
                         resolve(data);
                     })
                     .catch(error => {
@@ -361,7 +367,7 @@
 
                     console.log(`Procesando Fecha ${fechaIndex + 1}: Inicio: ${fechaInicio}, Límite: ${fechaLimite}`);
 
-                    // Validación: Ambas fechas deben estar completas
+                   
                     if (!fechaInicio || !fechaLimite) {
                         Swal.fire({
                             title: "Error!",
@@ -372,7 +378,7 @@
                         return;
                     }
 
-                    // Validación: Fecha Límite debe ser mayor a Fecha Inicio
+                    
                     if (new Date(fechaLimite) <= new Date(fechaInicio)) {
                         Swal.fire({
                             title: "Error!",
@@ -383,7 +389,7 @@
                         return;
                     }
 
-                    // Validación: No pueden haber dos fechas con la misma Fecha de Inicio
+               
                     if (fechasInicioSet.has(fechaInicio)) {
                         Swal.fire({
                             title: "Error!",
@@ -403,7 +409,7 @@
 
                         console.log(`Habitación ${habitacionId}: Precio ingresado: ${precio}`);
 
-                        // Validación: Precio solo números enteros positivos
+                    
                         if (!/^\d+$/.test(precio) || parseInt(precio) <= 0) {
                             Swal.fire({
                                 title: "Error!",
@@ -447,7 +453,6 @@
 
                 console.log("✅ Fechas recopiladas:", fechas);
 
-                // Construir los parámetros correctamente
                 let fechasParams = fechas.map((fecha, index) => {
                     let habitacionesParams = fecha.PrecioHabitacion.map((habitacion, hIndex) =>
                         `fechas[${index}].PrecioHabitacion[${hIndex}].IdHabitacion=${habitacion.IdHabitacion}&fechas[${index}].PrecioHabitacion[${hIndex}].Costo=${habitacion.Costo}`
@@ -466,12 +471,8 @@
                         return response.text();
                     })
                     .then(() => {
-                        Swal.fire({
-                            title: "Éxito",
-                            text: "Las fechas se han guardado correctamente.",
-                            icon: "success"
-                        });
-                        resolve();  // 🟢 Éxito
+                       
+                        resolve();  
                     })
                     .catch(error => {
                         console.error("❌ Error en la petición:", error);
@@ -491,20 +492,50 @@
 
         document.getElementById("crearBtn").addEventListener("click", async function () {
             try {
+                var nombre = document.getElementById("Nombre").value.trim();
+                var imagenInput = document.getElementById("ImageFile");
+                var imagen = imagenInput.files[0];
 
+            
+                if (nombre.length < 5) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "El nombre debe tener al menos 5 caracteres.",
+                        icon: "error"
+                    });
+                    return;
+                }
 
+          
+                if (!imagen) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Debe seleccionar una imagen.",
+                        icon: "error"
+                    });
+                    return;
+                }
+
+                
                 await addItinerario();
-
                 await addFechas();
 
-                setTimeout(() => {
+               
+                Swal.fire({
+                    title: "¡Éxito!",
+                    text: "Crucero agregado correctamente.",
+                    icon: "success",
+                    confirmButtonText: "OK"
+                }).then(() => {
                     console.log("🚀 Enviando formulario...");
                     document.querySelector("form").submit();
-                }, 1000);
+                });
+
             } catch (error) {
                 console.error("❌ Error en el proceso:", error);
             }
         });
+
 
 
 

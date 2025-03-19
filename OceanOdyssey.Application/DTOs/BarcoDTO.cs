@@ -26,7 +26,7 @@ namespace OceanOdyssey.Application.DTOs
         [Required(ErrorMessage = "{0} es un dato requerido")]
         public string? Descripcion { get; set; }
 
-        [Display(Name = "TotalHabitaciones")]
+        [Display(Name = "Total Habitaciones")]
         [Range(0, 8000, ErrorMessage = "El valor mínimo es {0}")]
        
         public int? TotalHabitaciones { get; set; }
