@@ -20,6 +20,14 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             _context = context;
         }
 
+        public async  Task<ICollection<ResumenReservacion>> buscarXCruceroYfecha( int IDFechaCrucero)
+        {
+            var collection= await _context.Set<ResumenReservacion>()
+        .Where(r => r.FechaCrucero == IDFechaCrucero)
+        .ToListAsync();
+            return collection;
+        }
+
         public async Task<ResumenReservacion> FindByIdAsync(int id)
         {
             var @object = await _context.Set<ResumenReservacion>()

@@ -1,0 +1,86 @@
+﻿@model IEnumerable<OceanOdyssey.Application.DTOs.ResumenReservacionDTO>
+
+<div class="card-container">
+    @foreach (var item in Model)
+    {
+        <div class="card">
+            <div class="card-header">
+                <h3>Reserva #@Html.DisplayFor(modelItem => item.Id)</h3>
+            </div>
+            <div class="card-body">
+                <div class="card-info">
+
+                    <p><strong>Crucero ID:</strong> @Html.DisplayFor(modelItem => item.Idcrucero)</p>
+                    <p><strong>Cantidad Habitaciones:</strong> @Html.DisplayFor(modelItem => item.CantidadHabitaciones)</p>
+
+
+                    <p><strong>Estado:</strong> @Html.DisplayFor(modelItem => item.Estado)</p>
+                    <p><strong>Fecha Crucero:</strong> @Html.DisplayFor(modelItem => item.FechaCruceroNavigation.FechaInicio)</p>
+
+                </div>
+            </div>
+            <div class="card-footer">
+
+                <a class="btn btn-success" asp-action="Details" asp-route-id="@item.Id" style="color: black;">Detalles</a>
+
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .card {
+        width: 300px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-header {
+        background-color: #80c4ac;
+        color: black;
+        padding: 16px;
+        text-align: center;
+    }
+
+    .card-body {
+        padding: 16px;
+        display: none;
+    }
+
+    .card-footer {
+        background-color: #f4f4f4;
+        padding: 8px;
+        text-align: center;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+        .card:hover .card-body {
+            display: block;
+        }
+
+    .card-info p {
+        margin: 8px 0;
+    }
+
+    .card-footer a {
+        text-decoration: none;
+        color: #007BFF;
+    }
+
+        .card-footer a:hover {
+            text-decoration: underline;
+        }
+</style>

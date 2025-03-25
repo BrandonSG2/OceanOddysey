@@ -1,0 +1,94 @@
+﻿@model IEnumerable<OceanOdyssey.Application.DTOs.UsuarioDTO>
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@{
+    ViewData["Title"] = "IndexAdmin";
+}
+
+<h1>Lista de usuarios</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear nuevo usuario</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+           
+            <th>
+                @Html.DisplayNameFor(model => model.Nombre)
+            </th>
+            
+            <th>
+                @Html.DisplayNameFor(model => model.Rol)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Telefono)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Idpais)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.Nombre)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.Rol)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Telefono)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Idpais)
+            </td>
+                
+        </tr>
+}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="5">
+                <div class="btn-toolbar d-flex justify-content-end" role="toolbar">
+                    <div class="btn-group" role="group">
+                        @Html.PagedListPager((IPagedList)Model, page =>
+                                 Url.Action("IndexAdmin", new { page }), new PagedListRenderOptions
+                        {
+                            Display = PagedListDisplayMode.Always,
+                            MaximumPageNumbersToDisplay = 5,
+                            LiElementClasses = new String[] { "page-item" },
+                            PageClasses = new String[] { "page-link" }
+                        }
+                                 )
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+@if (ViewBag.NotificationMessage != null)
+{
+    <script>
+        Swal.fire({
+            icon: "success",
+            title: "¡Éxito!",
+            text: "@Html.Raw(ViewBag.NotificationMessage)"
+        });
+    </script>
+}
+
+<!-- Depuración en consola -->
+<script>
+    console.log("Mensaje de ViewBag:", "@ViewBag.NotificationMessage");
+</script>
