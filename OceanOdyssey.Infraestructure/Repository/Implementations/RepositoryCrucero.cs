@@ -53,13 +53,28 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
         }
 
 
+        public async Task<Crucero> FindCruceroByIdAsync(int idCrucero)
+        {
+            var crucero = await _context.Set<Crucero>()
+                .Include(x => x.Itinerario)
+                    .ThenInclude(x => x.IdpuertoNavigation)
+                .Include(x => x.IdbarcoNavigation)
+                .Include(x => x.FechaCrucero)
+                .Where(x => x.Id == idCrucero)
+                .FirstOrDefaultAsync();
+
+            return crucero!;
+        }
+
+
+
 
         public async Task<int> AddAsync(Crucero cruceroDto)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-           
+
                 var crucero = new Crucero
                 {
                     Nombre = cruceroDto.Nombre,

@@ -10,8 +10,8 @@ namespace OceanOdyssey.Application.Services.Interfaces
     public interface IServiceResumenReservacion
     {
         Task<ICollection<ResumenReservacionDTO>> ListAsync();
-        Task<ICollection<ResumenReservacionDTO>> buscarXCruceroYfecha(int IDFechaCrucero);
         Task<ResumenReservacionDTO> FindByIdAsync(int id);
+        // Task<ResumenReservacionDTO> FindByIdAsyncCrucero(int id);
 
     }
 }

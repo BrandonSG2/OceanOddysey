@@ -16,4 +16,5 @@ public partial class PrecioHabitacion
     public virtual FechaCrucero? IdFechaCruceroNavigation { get; set; }
 
     public virtual Habitacion IdhabitacionNavigation { get; set; } = null!;
+
 }

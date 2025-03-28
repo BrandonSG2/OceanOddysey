@@ -9,6 +9,12 @@ namespace OceanOdyssey.Infraestructure.Repository.Interfaces
 {
     public interface IRepositoryFechaCrucero
     {
+
+
         Task<ICollection<FechaCrucero>> ListAsync();
+        Task<FechaCrucero> FindByIdAsync(int id);
+
+        Task<ICollection<FechaCrucero>> FechaXCrucero(int idCrucero);
+        Task<ICollection<PrecioHabitacion>> PreciosHabitacionesPorFecha(int idFechaCrucero);
     }
 }

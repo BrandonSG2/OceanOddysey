@@ -17,5 +17,7 @@ namespace OceanOdyssey.Application.DTOs
         public virtual FechaCruceroDTO? IdFechaCruceroNavigation { get; set; }
 
         public virtual HabitacionDTO IdhabitacionNavigation { get; set; } = null!;
+
+
     }
 }

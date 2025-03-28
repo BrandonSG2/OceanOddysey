@@ -7,12 +7,9 @@ using System.Threading.Tasks;
 
 namespace OceanOdyssey.Infraestructure.Repository.Interfaces
 {
-    public interface IRepositoryCrucero
+    public interface IRepositoryComplemento
     {
-
-        Task<ICollection<Crucero>> ListAsync();
-        Task<Crucero> FindByIdAsync(int id);
-        Task<int> AddAsync(Crucero dto);
-        Task<Crucero> FindCruceroByIdAsync(int idCrucero);
+        Task<ICollection<Complemento>> ListAsync();
+        Task<Complemento> FindByIdAsync(int id);
     }
 }
