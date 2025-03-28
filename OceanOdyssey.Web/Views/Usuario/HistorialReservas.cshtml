@@ -1,0 +1,112 @@
+﻿@model IEnumerable<OceanOdyssey.Application.DTOs.ResumenReservacionDTO>
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@{
+    ViewData["Title"] = "HistorialReservas";
+}
+
+<h1>Mi historial de reservas</h1>
+
+<p>
+    <a asp-action="Create" asp-controller="ResumenReservacion" class="btn btn-primary">Crear nueva reservacion</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Idusuario)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Idcrucero)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CantidadHabitaciones)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PrecioTotal)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Impuestos)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalFinal)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Estado)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaCrucero)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalHabitaciones)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Idusuario)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Idcrucero)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CantidadHabitaciones)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PrecioTotal)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Impuestos)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalFinal)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Estado)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FechaCrucero)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalHabitaciones)
+            </td>
+            <td>
+                    <div class="btn-group" role="group" aria-label="Acciones">
+                       
+                        <a href="@Url.Action("Details", new { id = item.Id })" class="btn " style="background-color:aqua">
+                            <i class="bi bi-zoom-in"></i> Detalle
+                        </a>
+                    </div>
+            </td>
+        </tr>
+}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="5">
+                <div class="btn-toolbar d-flex justify-content-end" role="toolbar">
+                    <div class="btn-group" role="group">
+                        @Html.PagedListPager((IPagedList)Model, page =>
+                                 Url.Action("HistorialReservas", new { page }), new PagedListRenderOptions
+                        {
+                            Display = PagedListDisplayMode.Always,
+                            MaximumPageNumbersToDisplay = 5,
+                            LiElementClasses = new String[] { "page-item" },
+                            PageClasses = new String[] { "page-link" }
+                        }
+                                 )
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tfoot>
+</table>

@@ -5,89 +5,57 @@
 }
 
 <h1>Lista de Reservas</h1>
-
-
-<div class="card-container">
-    @foreach (var item in Model)
-    {
-        <div class="card">
-            <div class="card-header">
-                <h3>Reserva #@Html.DisplayFor(modelItem => item.Id)</h3>
-            </div>
-            <div class="card-body">
-                <div class="card-info">
-                     
-                    <p><strong>Crucero ID:</strong> @Html.DisplayFor(modelItem => item.Idcrucero)</p>
-                    <p><strong>Cantidad Habitaciones:</strong> @Html.DisplayFor(modelItem => item.CantidadHabitaciones)</p>
-                  
-                  
-                    <p><strong>Estado:</strong> @Html.DisplayFor(modelItem => item.Estado)</p>
-                    <p><strong>Fecha Crucero:</strong> @Html.DisplayFor(modelItem => item.FechaCruceroNavigation.FechaInicio)</p>
-                 
-                </div>
-            </div>
-            <div class="card-footer">
-              
-                <a class="btn btn-success" asp-action="Details" asp-route-id="@item.Id" style="color: black;">Detalles</a>
-               
-            </div>
+<section class="row">
+    <div class="col-2">
+        <ul class="list-group" style="background-color:white">
+            <li class="list-group-item">
+                <button type="button" class="btn btn-info" onclick="buscarxCategoria(0)">Todos</button>
+            </li>
+            <p>
+                <a asp-action="Create" asp-controller="ResumenReservacion" class="btn btn-primary">Crear nueva reservacion</a>
+            </p>
+            @foreach (var item in (List<OceanOdyssey.Application.DTOs.FechaCruceroDTO>)ViewBag.ListFechas)
+            {
+                <li class="list-group-item">
+                    <button type="button" class="btn btn-info" onclick="buscarxCategoria(@item.Id)">@item.IdcruceroNavigation.Nombre @item.FechaInicio</button>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="col">
+        <div id="listaLibros" >
+            @await Html.PartialAsync("_ListReservas", Model)
         </div>
-    }
-</div>
+    </div>
+</section>
 
-<style>
-    .card-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 16px;
-    }
-
-    .card {
-        width: 300px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card-header {
-        background-color: #80c4ac;
-        color: black;
-        padding: 16px;
-        text-align: center;
-    }
-
-    .card-body {
-        padding: 16px;
-        display: none;
-    }
-
-    .card-footer {
-        background-color: #f4f4f4;
-        padding: 8px;
-        text-align: center;
-    }
-
-    .card:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    }
-
-        .card:hover .card-body {
-            display: block;
+@section Scripts {
+    <script type="text/javascript">
+        function buscarxCategoria(IdCategoria) {
+            const valIdCategoria = IdCategoria
+            const divLista = document.getElementById("listaLibros")
+            //Solicitud al controlador
+            const myRequest = '@Url.Action("buscarxCrucero", "ResumenReservacion")'
+            //Opciones de la solicitud o Método HTTP
+            const options = {
+                method: 'GET'
+            }
+            fetch(myRequest + "?idCrucero=" + valIdCategoria, options)
+                .then(function (response) {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text) })
+                    }
+                    return response.text()
+                })
+                .then((text) => {
+                    divLista.innerHTML = text
+                }).catch(Error => {
+                    Swal.fire({
+                        title: "Error",
+                        text: error,
+                        icon: "error"
+                    })
+                })
         }
-
-    .card-info p {
-        margin: 8px 0;
-    }
-
-    .card-footer a {
-        text-decoration: none;
-        color: #007BFF;
-    }
-
-        .card-footer a:hover {
-            text-decoration: underline;
-        }
-</style>
+    </script>
+}

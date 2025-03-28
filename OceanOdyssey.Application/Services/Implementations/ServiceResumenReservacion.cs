@@ -25,6 +25,15 @@ namespace OceanOdyssey.Application.Services.Implementations
             _logger = logger;
         }
 
+        public async Task<ICollection<ResumenReservacionDTO>> buscarXCruceroYfecha(int IDFechaCrucero)
+        {
+            var list = await _repository.buscarXCruceroYfecha(IDFechaCrucero);
+            // map List<Barco> a ICollection<BarcoDTO>
+            var collection = _mapper.Map<ICollection<ResumenReservacionDTO>>(list);
+            // retorna la lista
+            return collection;
+        }
+
         public async Task<ResumenReservacionDTO> FindByIdAsync(int id)
         {
             var @object = await _repository.FindByIdAsync(id);

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OceanOdyssey.Application.DTOs;
 using OceanOdyssey.Application.Services.Interfaces;
 
 namespace OceanOdyssey.Web.Controllers
@@ -7,20 +8,31 @@ namespace OceanOdyssey.Web.Controllers
     public class ResumenReservacionController : Controller
     {
         private readonly IServiceResumenReservacion _serviceResumenReservacion;
-
-        public ResumenReservacionController(IServiceResumenReservacion serviceResumenReservacion)
+        private readonly IServiceFechaCrucero _serviceFechaCrucero;
+        public ResumenReservacionController(IServiceResumenReservacion serviceResumenReservacion, IServiceFechaCrucero serviceFechaCrucero)
         {
             _serviceResumenReservacion = serviceResumenReservacion;
+            _serviceFechaCrucero = serviceFechaCrucero;
         }
 
         // GET: ResumenReservacion
         public async Task<ActionResult> Index()
         {
             var collection = await _serviceResumenReservacion.ListAsync();
-         
+            ViewBag.ListFechas = await _serviceFechaCrucero.ListAsync();
             return View(collection);
         }
+        [HttpGet]
+        public async Task<IActionResult> buscarxCrucero(int idCrucero)
+        {
+            var collection = await _serviceResumenReservacion.ListAsync();
+            if (idCrucero != 0)
+            {
+                collection = await _serviceResumenReservacion.buscarXCruceroYfecha(idCrucero) ?? new List<ResumenReservacionDTO>(); ;
 
+            }
+            return PartialView("_ListReservas", collection);
+        }
         // GET: ResumenReservacion/Details/5
         public async Task<IActionResult> Details(int? id)
         {
