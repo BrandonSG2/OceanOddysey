@@ -20,14 +20,6 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             _context = context;
         }
 
-        public async  Task<ICollection<ResumenReservacion>> buscarXCruceroYfecha( int IDFechaCrucero)
-        {
-            var collection= await _context.Set<ResumenReservacion>()
-        .Where(r => r.FechaCrucero == IDFechaCrucero)
-        .ToListAsync();
-            return collection;
-        }
-
         public async Task<ResumenReservacion> FindByIdAsync(int id)
         {
             var @object = await _context.Set<ResumenReservacion>()
@@ -53,7 +45,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             {
                 var fechaCrucero = @object.FechaCruceroNavigation?.FechaInicio;
 
-              
+
                 foreach (var reserva in @object.ReservaHabitacion)
                 {
                     reserva.IdhabitacionNavigation!.PrecioHabitacion = reserva.IdhabitacionNavigation.PrecioHabitacion
@@ -64,6 +56,8 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
 
             return @object!;
         }
+
+
 
 
 

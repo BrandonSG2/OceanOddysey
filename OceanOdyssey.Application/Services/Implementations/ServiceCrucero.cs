@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace OceanOdyssey.Application.Services.Implementations
 {
-    public class ServiceCrucero:IServiceCrucero
+    public class ServiceCrucero : IServiceCrucero
     {
         private readonly IRepositoryCrucero _repository;
         private readonly IMapper _mapper;
@@ -41,13 +41,19 @@ namespace OceanOdyssey.Application.Services.Implementations
             return collection;
         }
 
+        public async Task<CruceroDTO> FindByIdAsyncCrucero(int id)
+        {
+            var @object = await _repository.FindCruceroByIdAsync(id);
+            var objectMapped = _mapper.Map<CruceroDTO>(@object);
+            return objectMapped;
+        }
 
         public async Task<int> AddAsync(CruceroDTO dto)
         {
-          
+
             var cruceroMapped = _mapper.Map<Crucero>(dto);
 
-    
+
             return await _repository.AddAsync(cruceroMapped);
         }
 

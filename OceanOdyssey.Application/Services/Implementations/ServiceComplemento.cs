@@ -11,35 +11,34 @@ using System.Threading.Tasks;
 
 namespace OceanOdyssey.Application.Services.Implementations
 {
-    public class ServiceResumenReservacion : IServiceResumenReservacion
+    public class ServiceComplemento : IServiceComplemento
     {
-        private readonly IRepositoryResumenReservacion _repository;
+        private readonly IRepositoryComplemento _repository;
         private readonly IMapper _mapper;
 
         private readonly ILogger<ServiceBarco> _logger;
 
-        public ServiceResumenReservacion(IRepositoryResumenReservacion repository, IMapper mapper, ILogger<ServiceBarco> logger)
+        public ServiceComplemento(IRepositoryComplemento repository, IMapper mapper, ILogger<ServiceBarco> logger)
         {
             _repository = repository;
             _mapper = mapper;
             _logger = logger;
         }
 
-        public async Task<ResumenReservacionDTO> FindByIdAsync(int id)
+        public async Task<ComplementoDTO> FindByIdAsync(int id)
         {
             var @object = await _repository.FindByIdAsync(id);
-            var objectMapped = _mapper.Map<ResumenReservacionDTO>(@object);
+            var objectMapped = _mapper.Map<ComplementoDTO>(@object);
             return objectMapped;
         }
 
-
-
-        public async Task<ICollection<ResumenReservacionDTO>> ListAsync()
+        public async Task<ICollection<ComplementoDTO>> ListAsync()
         {
             //obtener datos del repositorio 
+
             var list = await _repository.ListAsync();
             // map List<Barco> a ICollection<BarcoDTO>
-            var collection = _mapper.Map<ICollection<ResumenReservacionDTO>>(list);
+            var collection = _mapper.Map<ICollection<ComplementoDTO>>(list);
             // retorna la lista
             return collection;
         }
