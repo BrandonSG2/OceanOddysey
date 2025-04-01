@@ -41,16 +41,16 @@
                     <h4 class="text-center">Información Financiera</h4>
                     <dl class="row">
                         <dt class="col-sm-5">Total por Habitaciones:</dt>
-                        <dd class="col-sm-7">$@Model.TotalHabitaciones.ToString("N2")</dd>
+                        <dd class="col-sm-7">@Html.DisplayFor(model => model.TotalHabitaciones)</dd>
 
                         <dt class="col-sm-5">Subtotal:</dt>
-                        <dd class="col-sm-7">$@Model.PrecioTotal.ToString("N2")</dd>
+                        <dd class="col-sm-7">@Html.DisplayFor(model => model.PrecioTotal)</dd>
 
                         <dt class="col-sm-5">Impuestos:</dt>
-                        <dd class="col-sm-7">$@Model.Impuestos.ToString("N2")</dd>
+                        <dd class="col-sm-7">@Html.DisplayFor(model => model.Impuestos)</dd>
 
                         <dt class="col-sm-5">Precio Total:</dt>
-                        <dd class="col-sm-7 text-success font-weight-bold">$@Model.TotalFinal.ToString("N2")</dd>
+                        <dd class="col-sm-7 text-success font-weight-bold">@Html.DisplayFor(model => model.TotalFinal)</dd>
 
                         <dt class="col-sm-5">Estado de Pago:</dt>
                         <dd class="col-sm-7">
@@ -68,7 +68,7 @@
 
                             <dt class="col-sm-5">Monto a Cancelar:</dt>
                             <dd class="col-sm-7 text-success font-weight-bold">
-                                $@Model.TotalFinal.ToString("N2")
+                                @Html.DisplayFor(model => model.TotalFinal)
                             </dd>
 
                         }
@@ -114,10 +114,10 @@
                     <tr>
                         <td class="fw-bold">@habitacion.IdhabitacionNavigation!.Nombre</td>
                         <td>@habitacion.IdhabitacionNavigation.Detalles</td>
-                        <td>$@habitacion.IdhabitacionNavigation.PrecioHabitacion.First().Costo.ToString("N2")</td>
+                        <td>@Html.DisplayFor(model => habitacion.IdhabitacionNavigation.PrecioHabitacion.First().Costo)</td>
                         <td>@string.Join(", ", habitacion.IdhabitacionNavigation.Pasajero.Select(p => p.Nombre))</td>
                         <td>@cantidad</td>
-                        <td>$@total.ToString("N2")</td>
+                        <td>@Html.DisplayFor(model => total)</td>
                     </tr>
                 }
             </tbody>
@@ -147,8 +147,8 @@
                         <td class="fw-bold">@complemento.IdcomplementoNavigation!.Nombre</td>
                         <td>@complemento.IdcomplementoNavigation.Detalle</td>
                         <td>@cantidad</td>
-                        <td>@("$" + precio.ToString("N2"))</td>
-                        <td>@("$" + total.ToString("N2"))</td>
+                        <td>@Html.DisplayFor(model => complemento.IdcomplementoNavigation!.Precio)</td>
+                        <td>@Html.DisplayFor(model => total)</td>
                     </tr>
                 }
             </tbody>

@@ -296,7 +296,8 @@
 
                 
                     $.each(data, function (index, item) {
-                        selectHabitacion.append(`<option value="${item.idHabitacion}" data-nombre="${item.nombreHabitacion}" data-costo="${item.costo}">${item.nombreHabitacion} - $${item.costo}</option>`);
+                                var precioFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(item.costo);
+                                selectHabitacion.append(`<option value="${item.idHabitacion}" data-nombre="${item.nombreHabitacion}" data-costo="${item.costo}">${item.nombreHabitacion} - ${precioFormateado}</option>`);
                     });
                 },
                 error: function (xhr, status, error) {
@@ -323,14 +324,14 @@
             }
 
             var cardId = 'habitacion' + Date.now();
-
+                    var precioFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(habitacionCosto);
             var cardHtml = `
                 <div class="col-12 mb-3" id="${cardId}">
                     <div class="card h-100 shadow-lg border-0">
                         <div class="card-body">
                             <h5 class="card-title text-center">${habitacionId}</h5>
                             <h4 class="card-title text-center">${habitacionNombre}</h4>
-                            <p class="card-text text-center">Precio: $${habitacionCosto.toFixed(2)}</p>
+                                            <p class="card-text text-center">Precio: ${precioFormateado}</p>
                             <div class="form-group text-center">
                                 <label for="cantidad${cardId}">Cantidad de pasajeros:</label>
                                 <input type="number" class="form-control w-50 mx-auto" id="cantidad${cardId}" min="1" max="10" value="1">
@@ -566,7 +567,7 @@
             let nombre = complementoSeleccionado.text;
             let detalle = complementoSeleccionado.dataset.detalle || "Sin detalles";
             let precio = parseFloat(complementoSeleccionado.dataset.precio || "0.00");
-
+                    let precioFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(precio);
             let tabla = document.getElementById("tablaComplementos").getElementsByTagName("tbody")[0];
             document.getElementById("tablaComplementos").classList.remove("d-none");
 
@@ -576,7 +577,7 @@
             fila.insertCell(0).textContent = id;
             fila.insertCell(1).textContent = nombre;
             fila.insertCell(2).textContent = detalle;
-            fila.insertCell(3).textContent = precio.toFixed(2);
+                    fila.insertCell(3).textContent = precioFormateado;
 
             let cantidadInput = document.createElement("input");
             cantidadInput.type = "number";
@@ -589,8 +590,9 @@
             fila.insertCell(4).appendChild(cantidadInput);
 
             let subtotal = precio;
+                    let subtotalFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(subtotal);
             let subtotalCell = fila.insertCell(5);
-            subtotalCell.textContent = subtotal.toFixed(2);
+                    subtotalCell.textContent = subtotalFormateado;
 
             fila.insertCell(6).innerHTML = `
                 <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this, ${subtotal})">Eliminar</button>
@@ -603,7 +605,7 @@
             let filaDetalle = tablaDetalle.insertRow();
             filaDetalle.setAttribute("data-id", id);
             filaDetalle.insertCell(0).textContent = nombre;
-            filaDetalle.insertCell(1).textContent = subtotal.toFixed(2);
+                    filaDetalle.insertCell(1).textContent = subtotalFormateado;
 
             actualizarTotalComplementos();
         }
@@ -611,7 +613,8 @@
         function actualizarSubtotal(fila, precio, id) {
             let cantidad = parseInt(fila.cells[4].querySelector("input").value) || 1;
             let subtotal = precio * cantidad;
-            fila.cells[5].textContent = subtotal.toFixed(2);
+                    let subtotalFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(subtotal);
+                    fila.cells[5].textContent = subtotalFormateado;
 
             let filaDetalle = document.querySelector(`#detalleComplementos tbody tr[data-id="${id}"]`);
             if (filaDetalle) {
@@ -630,9 +633,9 @@
                         let subtotal = parseFloat(fila.cells[5].textContent) || 0;
                         total += subtotal;
                     });
-
+                    let totalFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(total);
                     // Actualizar la interfaz con el nuevo total
-                    $('#totalComplementos').text(total.toFixed(2));
+                    $('#totalComplementos').text(totalFormateado);
 
                     // Enviar el total al servidor con AJAX
                     $.ajax({
@@ -664,11 +667,13 @@
                     let subtotal = totalHabitaciones + totalComplementos;
                     let impuestos = subtotal * 0.13;
                     let precioTotal = subtotal + impuestos;
-
+                    let subtotalFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(subtotal);
+                    let impuestosFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(impuestos);
+                    let precioTotalFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(precioTotal);
                     // Actualizar la interfaz
-                    $('#subtotal').text(subtotal.toFixed(2));
-                    $('#impuestos').text(impuestos.toFixed(2));
-                    $('#precioTotal').text(precioTotal.toFixed(2));
+                    $('#subtotal').text(subtotalFormateado);
+                    $('#impuestos').text(impuestosFormateado);
+                    $('#precioTotal').text(precioTotalFormateado);
 
                     // Enviar los datos al servidor con AJAX
                     $.ajax({

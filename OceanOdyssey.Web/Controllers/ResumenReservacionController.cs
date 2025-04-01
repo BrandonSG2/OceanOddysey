@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OceanOdyssey.Application.DTOs;
 using OceanOdyssey.Application.Services.Implementations;
@@ -6,7 +7,7 @@ using OceanOdyssey.Application.Services.Interfaces;
 using OceanOdyssey.Web.UpdateModels;
 
 namespace OceanOdyssey.Web.Controllers
-{
+{ 
     public class ResumenReservacionController : Controller
     {
         private readonly IServiceResumenReservacion _serviceResumenReservacion;
@@ -34,7 +35,8 @@ namespace OceanOdyssey.Web.Controllers
 
             return View(collection);
         }
-
+        [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         // GET: ResumenReservacion/Details/5
         public async Task<IActionResult> Details(int? id)
         {
