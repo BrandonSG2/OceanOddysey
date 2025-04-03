@@ -34,7 +34,7 @@ namespace OceanOdyssey.Application.DTOs
         public int Idbarco { get; set; }
 
         public bool Disponible { get; set; }
-
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal Costo { get; set; }
 
         public virtual List<FechaCruceroDTO> FechaCrucero { get; set; } = null!;

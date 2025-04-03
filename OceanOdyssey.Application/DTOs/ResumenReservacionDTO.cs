@@ -21,10 +21,12 @@ namespace OceanOdyssey.Application.DTOs
         [Display(Name = "Habitaciones")]
         public int CantidadHabitaciones { get; set; }
         [Display(Name = "Subtotal")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal PrecioTotal { get; set; }
-
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal Impuestos { get; set; }
         [Display(Name = "Total")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal TotalFinal { get; set; }
 
         public string Estado { get; set; } = null!;

@@ -12,9 +12,13 @@ using OceanOdyssey.Application.Services.Implementations;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using OceanOdyssey.Application.Config;
-
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
+var cultureInfo = new CultureInfo("es-CR");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 // Mapeo de la clase AppConfig para leer appsettings.json
 builder.Services.Configure<AppConfig>(builder.Configuration);
 
@@ -32,6 +36,7 @@ builder.Services.AddTransient<IRepositoryBarcoHabitacion, RepositoryBarcoHabitac
 builder.Services.AddTransient<IRepositoryUsuario, RepositoryUsuario>();
 builder.Services.AddTransient<IRepositoryPais, RepositoryPais>();
 builder.Services.AddTransient<IRepositoryFechaCrucero, RepositoryFechaCrucero>();
+builder.Services.AddTransient<IRepositoryComplemento, RepositoryComplemento>();
 //Services
 builder.Services.AddTransient<IServiceBarco, ServiceBarco>();
 builder.Services.AddTransient<IServiceHabitacion, ServiceHabitacion>();
@@ -42,6 +47,7 @@ builder.Services.AddTransient<IServiceBarcoHabitacion, ServiceBarcoHabitacion>()
 builder.Services.AddTransient<IServiceUsuario, ServiceUsuario>();
 builder.Services.AddTransient<IServicePais, ServicePais>();
 builder.Services.AddTransient<IServiceFechaCrucero, ServiceFechaCrucero>();
+builder.Services.AddTransient<IServiceComplemento, ServiceComplemento>();
 //Seguridad
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -61,6 +67,12 @@ builder.Services.AddControllersWithViews(options =>
             }
         );
 });
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals;
+    });
 //Configurar Automapper
 builder.Services.AddAutoMapper(config =>
 {
@@ -123,7 +135,19 @@ else
     app.UseMiddleware<ErrorHandlingMiddleware>();
 }
 
+var supportedCultures = new[] { cultureInfo };
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(cultureInfo),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+};
 
+app.UseRequestLocalization(localizationOptions);
+
+app.UseRouting();
+app.UseAuthorization();
+app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
 //Activar soporte a la solicitud de registro con SERILOG
 app.UseSerilogRequestLogging();

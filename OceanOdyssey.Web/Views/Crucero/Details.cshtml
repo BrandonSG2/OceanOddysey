@@ -64,7 +64,7 @@
                         {
                             @foreach (var precio in preciosFecha)
                             {
-                                <p><strong>Precio:</strong> $@precio.Costo</p>
+                                <p><strong>Precio:</strong> @Html.DisplayFor(precio=>precio.Costo)</p>
                             }
                         }
                         else
