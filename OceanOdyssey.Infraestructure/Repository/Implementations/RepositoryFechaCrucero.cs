@@ -49,6 +49,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             var @object = await _context.Set<FechaCrucero>()
 
                 .Where(x => x.Id == id)
+                .Include(x=> x.IdcruceroNavigation)
                 .FirstOrDefaultAsync();
 
 
@@ -58,7 +59,9 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
         public async Task<ICollection<FechaCrucero>> ListAsync()
         {
             // select * from fecha crucero
-            var collection = await _context.Set<FechaCrucero>().ToListAsync();
+            var collection = await _context.Set<FechaCrucero>().
+                Include(x => x.IdcruceroNavigation)
+                .ToListAsync();
             return collection;
         }
 

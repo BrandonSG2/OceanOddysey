@@ -20,6 +20,79 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             _context = context;
         }
 
+        public async Task<int> AddAsync(ResumenReservacion dto)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+           
+                var reservacion = new ResumenReservacion
+                {
+                    Idusuario = dto.Idusuario,
+                    Idcrucero = dto.Idcrucero,
+                    FechaReservacion = DateOnly.FromDateTime(DateTime.Now),
+                    CantidadHabitaciones = dto.CantidadHabitaciones,
+                    PrecioTotal = dto.PrecioTotal,
+                    Impuestos = dto.Impuestos,
+                    TotalFinal = dto.TotalFinal,
+                    Estado = dto.Estado,
+                    FechaCrucero = dto.FechaCrucero,
+                    FechaPago = dto.FechaPago,
+                    TotalHabitaciones = dto.TotalHabitaciones
+                };
+
+                _context.ResumenReservacion.Add(reservacion);
+                await _context.SaveChangesAsync();
+
+             
+                if (dto.ReservaHabitacion != null && dto.ReservaHabitacion.Any())
+                {
+                    var habitaciones = dto.ReservaHabitacion.Select(h => new ReservaHabitacion
+                    {
+                        IdresumenReserva = reservacion.Id,
+                        Idhabitacion = h.Idhabitacion,
+                        Idpasajero = h.Idpasajero,
+                    }).ToList();
+
+                    _context.ReservaHabitacion.AddRange(habitaciones);
+                    await _context.SaveChangesAsync();
+                }
+
+                
+                if (dto.ReservaComplemento != null && dto.ReservaComplemento.Any())
+                {
+                    var complementos = dto.ReservaComplemento.Select(c => new ReservaComplemento
+                    {
+                        IdresumenReserva = reservacion.Id,
+                        Idcomplemento = c.Idcomplemento,
+                        Cantidad = c.Cantidad,
+                      
+                    }).ToList();
+
+                    _context.ReservaComplemento.AddRange(complementos);
+                    await _context.SaveChangesAsync();
+                }
+
+                await transaction.CommitAsync();
+                return reservacion.Id;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+               
+                return -1;
+            }
+        }
+
+
+        public async Task<ICollection<ResumenReservacion>> buscarXCruceroYfecha(int IDFechaCrucero)
+        {
+            var collection = await _context.Set<ResumenReservacion>()
+        .Where(r => r.FechaCrucero == IDFechaCrucero)
+        .ToListAsync();
+            return collection;
+        }
         public async Task<ResumenReservacion> FindByIdAsync(int id)
         {
             var @object = await _context.Set<ResumenReservacion>()

@@ -17,8 +17,9 @@
             @foreach (var item in (List<OceanOdyssey.Application.DTOs.FechaCruceroDTO>)ViewBag.ListFechas)
             {
                 <li class="list-group-item">
-                    <button type="button" class="btn btn-info" onclick="buscarxCategoria(@item.Id)">@item.IdcruceroNavigation.Nombre @item.FechaInicio</button>
+                    <button type="button" class="btn btn-info" onclick="buscarxCategoria(@item.Id)">  @item.IdcruceroNavigation.Nombre @item.FechaInicio </button>
                 </li>
+              
             }
         </ul>
     </div>

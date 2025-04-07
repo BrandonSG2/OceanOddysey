@@ -11,7 +11,9 @@ namespace OceanOdyssey.Infraestructure.Repository.Interfaces
     {
         Task<ICollection<ResumenReservacion>> ListAsync();
         Task<ResumenReservacion> FindByIdAsync(int id);
+        Task<ICollection<ResumenReservacion>> buscarXCruceroYfecha(int IDFechaCrucero);
 
+        Task<int> AddAsync(ResumenReservacion dto);
         //Task<ResumenReservacion> FindByCruceroIdAsync(int idCrucero);
 
         //Task<int> GetTotalHabitaciones(int idBarco);

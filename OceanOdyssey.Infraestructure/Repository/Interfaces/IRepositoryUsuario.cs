@@ -12,6 +12,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Interfaces
         Task<ICollection<Usuario>> FindByDescriptionAsync(string description);
         Task<ICollection<Usuario>> ListAsync();
         Task<Usuario> FindByIdAsync(string id);
+        Task<Usuario> FindByIdAsyncReserva(string id);
         Task<ICollection<ResumenReservacion>> HistorialUsuario(string id);
         Task<Usuario> LoginAsync(string id, string password);
         Task<string> AddAsync(Usuario entity);

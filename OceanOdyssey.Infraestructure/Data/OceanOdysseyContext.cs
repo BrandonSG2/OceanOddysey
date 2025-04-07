@@ -51,6 +51,7 @@ public partial class OceanOdysseyContext : DbContext
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Descripcion).HasMaxLength(255);
             entity.Property(e => e.Nombre).HasMaxLength(100);
+
         });
 
         modelBuilder.Entity<BarcoHabitacion>(entity =>
@@ -115,6 +116,7 @@ public partial class OceanOdysseyContext : DbContext
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Detalles).HasMaxLength(255);
             entity.Property(e => e.Nombre).HasMaxLength(100);
+         
         });
 
         modelBuilder.Entity<Itinerario>(entity =>
@@ -169,15 +171,18 @@ public partial class OceanOdysseyContext : DbContext
             entity.Property(e => e.Costo).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.Idhabitacion).HasColumnName("IDHabitacion");
 
-            entity.HasOne(d => d.IdFechaCruceroNavigation).WithMany(p => p.PrecioHabitacion)
+            entity.HasOne(d => d.IdFechaCruceroNavigation)
+                .WithMany(p => p.PrecioHabitacion)
                 .HasForeignKey(d => d.IdFechaCrucero)
                 .HasConstraintName("FK_PrecioHabitacion_FechaCrucero");
 
-            entity.HasOne(d => d.IdhabitacionNavigation).WithMany(p => p.PrecioHabitacion)
+            entity.HasOne(d => d.IdhabitacionNavigation)
+                .WithMany(p => p.PrecioHabitacion)
                 .HasForeignKey(d => d.Idhabitacion)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.ClientNoAction).IsRequired(false)
                 .HasConstraintName("FK__PrecioHab__IDHab__34C8D9D1");
         });
+
 
         modelBuilder.Entity<Puerto>(entity =>
         {

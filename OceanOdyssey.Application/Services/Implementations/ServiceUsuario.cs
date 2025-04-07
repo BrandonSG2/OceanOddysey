@@ -57,6 +57,13 @@ namespace OceanOdyssey.Application.Services.Implementations
             return objectMapped;
         }
 
+        public async Task<UsuarioDTO> FindByIdAsyncReserva(string id)
+        {
+            var @object = await _repository.FindByIdAsyncReserva(id);
+            var objectMapped = _mapper.Map<UsuarioDTO>(@object);
+            return objectMapped;
+        }
+
         public async Task<ICollection<UsuarioDTO>> ListAsync()
         {
             var list = await _repository.ListAsync();

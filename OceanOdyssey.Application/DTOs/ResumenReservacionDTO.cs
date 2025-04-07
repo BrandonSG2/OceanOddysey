@@ -28,7 +28,7 @@ namespace OceanOdyssey.Application.DTOs
         [Display(Name = "Total")]
         [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal TotalFinal { get; set; }
-
+        [Display(Name = "Forma de Pago")]
         public string Estado { get; set; } = null!;
         
         public int FechaCrucero { get; set; }
@@ -46,5 +46,8 @@ namespace OceanOdyssey.Application.DTOs
         public virtual List<ReservaComplementoDTO> ReservaComplemento { get; set; } = null!;
 
         public virtual List<ReservaHabitacionDTO> ReservaHabitacion { get; set; } = null!;
+
+
+        public int TestFecha { get; set; }
     }
 }

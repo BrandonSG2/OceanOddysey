@@ -1,19 +1,22 @@
 ﻿@model OceanOdyssey.Application.DTOs.ResumenReservacionDTO
+@using System.Security.Claims
 
 @{
     ViewData["Title"] = "Create";
 }
 <div class="container-fluid mt-4">
     <div class="row">
-        <!-- Columna Izquierda - Crear Reserva (más ancha) -->
+        <!-- Columna Izquierda - Crear Reserva -->
         <div class="col-md-8">
             <form asp-action="Create">
+
                 <!-- Crucero -->
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">Crucero</h4>
+                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCrucero">Mostrar / Ocultar</button>
                     </div>
-                    <div class="card-body">
+                    <div id="collapseCrucero" class="collapse show card-body">
                         <div class="form-group mb-3">
                             <label asp-for="Idcrucero" class="control-label fw-bold"></label>
                             @Html.DropDownListFor(m => m.Idcrucero,
@@ -32,10 +35,11 @@
 
                 <!-- Habitaciones -->
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-info text-white">
+                    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">Habitaciones</h4>
+                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHabitaciones">Mostrar / Ocultar</button>
                     </div>
-                    <div class="card-body">
+                    <div id="collapseHabitaciones" class="collapse show card-body">
                         <div class="row mb-3">
                             <div class="col-8">
                                 <select id="selectHabitacion" class="form-select">
@@ -54,8 +58,9 @@
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">Complementos</h4>
+                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseComplementos">Mostrar / Ocultar</button>
                     </div>
-                    <div class="card-body">
+                    <div id="collapseComplementos" class="collapse show card-body">
                         <div class="d-flex align-items-center">
                             <select id="selectComplemento" class="form-select me-2">
                                 <option value="">Seleccione un complemento</option>
@@ -85,17 +90,149 @@
                     </div>
                 </div>
 
-                <!-- Botones de Acción -->
-                <div class="text-center">
-                    <button type="submit" class="btn btn-primary btn-lg">Confirmar Reserva</button>
-                    <a asp-action="Index" class="btn btn-secondary btn-lg">Cancelar</a>
+
+                <div class="container mt-4">
+                    <div class="row mb-4">
+                        <!-- Botón Agregar Habitaciones -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <button type="button" class="btn btn-primary w-100" onclick="addHabitaciones()">Agregar Habitaciones ID</button>
+                        </div>
+
+                        <!-- Botón Agregar Pasajeros -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <button type="button" class="btn btn-primary w-100" onclick="addPasajeros()">Agregar Pasajeros</button>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <!-- Botón Agregar Complementos -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <button type="button" class="btn btn-primary w-100" onclick="addReservaComplemento()">Agregar Complementos</button>
+                        </div>
+
+                        <!-- Botón Agregar Resumen -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <button type="button" class="btn btn-primary w-100" onclick="totalesReserva()">Agregar Resumen</button>
+                        </div>
+                    </div>
+
+                    <!-- Sección de Confirmar o Cancelar -->
+                    <div class="text-center mt-4">
+                        <button id="btnConfirmarReserva" class="btn btn-primary btn-lg">Confirmar Reserva</button>
+                        <button id="mostrar" type="button" class="btn btn-primary btn-lg">Confirmar esesesese</button>
+
+                        <button type="submit" id="btnConfirmarPago" class="btn btn-primary w-100 mt-3 p-2">Confirmar Pago</button>
+
+
+                        <a asp-action="Index" class="btn btn-secondary btn-lg">Cancelar</a>
+                    </div>
                 </div>
+             
+
+
+
+                <div id="pagoReserva" class="container mt-4 d-none">
+                    <h3 class="text-center">Pagar Reservación</h3>
+
+                    <!-- Mostrar información del usuario -->
+                    <div class="text-center mb-4">
+                        <p class="mb-0"><strong>Nombre:</strong> @User.Identity?.Name</p>
+                        <p><strong>Email:</strong> @User.FindFirst(ClaimTypes.Email)?.Value</p>
+
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Estado" class="control-label fw-bold"></label>
+                        <div class="form-check">
+                            <label for="pagoTotal" class="form-check-label">
+                                <input type="radio" name="pagoOpcion" id="pagoTotal" value="total" class="form-check-input" data-estado="Pagado">
+                                Pagar el saldo total: <span id="totalReservaPago">0</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Estado" class="control-label fw-bold"></label>
+                        <div class="form-check">
+                            <label for="pagoMinimo" class="form-check-label">
+                                <input type="radio" name="pagoOpcion" id="pagoMinimo" value="minimo" class="form-check-input" data-estado="Pendiente Pago">
+                                Pagar el depósito mínimo por huésped
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Estado" class="control-label fw-bold"></label>
+                        <div class="form-check">
+                            <label for="pagoTarjeta" class="form-check-label">
+                                <input type="radio" name="pagoOpcion" id="pagoTarjeta" value="tarjeta" class="form-check-input" data-estado="Pagado">
+                                Pagar con tarjeta de crédito
+                            </label>
+                        </div>
+                    </div>
+
+                    <input type="hidden" asp-for="Estado" id="estadoPago" />
+
+
+                    <div id="pagoMinimoCampos" class="d-none mt-3">
+                        <div class="form-group">
+
+                            <div class="form-group mt-2">
+                                <label for="totalApagar">Total a pagar:</label>
+                                <input type="text" id="totalPagarReserva" class="form-control" readonly>
+                            </div>
+                            <label for="montoPagoMinimo">Monto a pagar ahora:</label>
+                            <input type="number" id="montoPagoMinimo" class="form-control" min="0">
+                        </div>
+                        <div class="form-group mt-2">
+                            <label for="pendientePago">Pendiente por pagar:</label>
+                            <input type="text" id="pendientePago" class="form-control" readonly>
+                        </div>
+                    </div>
+
+
+
+                    <div id="tarjetaCreditoDatos" class="d-none">
+                        <h5>Datos de la Tarjeta de Crédito</h5>
+
+                        <div class="mb-3">
+                            <label for="numeroTarjeta" class="form-label">Número de Tarjeta (16 dígitos)</label>
+                            <input type="text" class="form-control" id="numeroTarjeta" maxlength="16">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fechaCaducidad" class="form-label">Fecha de Caducidad</label>
+                            <input type="month" class="form-control" id="fechaCaducidad">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cvv" class="form-label">Código CVV</label>
+                            <input type="text" class="form-control" id="cvv" maxlength="3">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="titularTarjeta" class="form-label">Nombre del Titular</label>
+                            <input type="text" class="form-control" id="titularTarjeta">
+                        </div>
+                    </div>
+
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary w-100 mt-3 p-2">Confirmar Pago</button>
+                    </div>
+                </div>
+
+
             </form>
         </div>
 
-        <!-- Columna Derecha - Resumen de Reserva (más estrecha y sticky) -->
+ 
+        
+
+
+        <!-- Columna Derecha - Resumen de Reserva -->
         <div class="col-md-4">
-            <div id="resumenReservaContainer" class="card shadow-sm">
+            <div id="resumenReservaContainer" class="card shadow-sm sticky-top">
                 <div class="card-header bg-dark text-white">
                     <h4 class="mb-0">Resumen de Reserva</h4>
                 </div>
@@ -106,22 +243,18 @@
                         <dl class="row">
                             <dt class="col-sm-5">Crucero:</dt>
                             <dd class="col-sm-7" id="nombreCrucero">-</dd>
-
                             <dt class="col-sm-5">Salida:</dt>
                             <dd class="col-sm-7" id="puertoSalida">-</dd>
-
                             <dt class="col-sm-5">Regreso:</dt>
                             <dd class="col-sm-7" id="puertoRegreso">-</dd>
-
                             <dt class="col-sm-5">Inicio:</dt>
                             <dd class="col-sm-7" id="fechaInicio">-</dd>
-
                             <dt class="col-sm-5">Fin:</dt>
                             <dd class="col-sm-7" id="fechaFin">-</dd>
                         </dl>
                     </div>
 
-                    <!-- Habitaciones y Pasajeros -->
+                    <!-- Habitaciones -->
                     <div id="detalleHabitaciones" class="mb-4">
                         <h5 class="text-primary">Habitaciones y Pasajeros</h5>
                         <table class="table table-bordered table-striped">
@@ -131,9 +264,7 @@
                                     <th>Pasajeros</th>
                                 </tr>
                             </thead>
-                            <tbody id="tablaHabitaciones">
-                                <!-- Se llenará dinámicamente -->
-                            </tbody>
+                            <tbody id="tablaHabitaciones"></tbody>
                         </table>
                     </div>
 
@@ -147,9 +278,7 @@
                                     <th>Precio Final</th>
                                 </tr>
                             </thead>
-                            <tbody id="tablaComplementos">
-                                <!-- Se llenará dinámicamente -->
-                            </tbody>
+                            <tbody id="tablaComplementos"></tbody>
                         </table>
                     </div>
 
@@ -159,16 +288,12 @@
                         <dl class="row">
                             <dt class="col-sm-6">Total Habitaciones:</dt>
                             <dd class="col-sm-6" id="totalHabitaciones">0</dd>
-
                             <dt class="col-sm-6">Total Complementos:</dt>
                             <dd class="col-sm-6" id="totalComplementos">0</dd>
-
                             <dt class="col-sm-6">Subtotal:</dt>
                             <dd class="col-sm-6" id="subtotal">0</dd>
-
                             <dt class="col-sm-6">Impuestos (13%):</dt>
                             <dd class="col-sm-6" id="impuestos">0</dd>
-
                             <dt class="col-sm-6">Total a Pagar:</dt>
                             <dd class="col-sm-6" id="precioTotal">0</dd>
                         </dl>
@@ -176,6 +301,9 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
 
 
 
@@ -196,6 +324,217 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
 
     }
+
+
+    <script>
+        // Convierte un string con formato ₡#,###.## a número
+        function obtenerValorNumerico(valorFormateado) {
+            if (!valorFormateado) return 0;
+            const limpio = valorFormateado.toString()
+                .replace(/[₡$\s]/g, '')
+                .replace(/\./g, '')
+                .replace(',', '.');
+            return parseFloat(limpio) || 0;
+        }
+
+        // Formatea número a ₡#,###.##
+        function formatoCRC(valor) {
+            return valor.toLocaleString('es-CR', { style: 'currency', currency: 'CRC' });
+        }
+
+        // Función para calcular el pendiente por pagar
+        function calcularPendientePago() {
+            const totalStr = document.getElementById("totalPagarReserva").value; // Total a pagar
+            const montoPagado = parseFloat(document.getElementById("montoPagoMinimo").value) || 0; // Monto pagado
+            const total = obtenerValorNumerico(totalStr);
+
+            const pendiente = total - montoPagado; // Calcula el pendiente por pagar
+            document.getElementById("pendientePago").value = formatoCRC(pendiente >= 0 ? pendiente : 0); // Muestra el pendiente
+        }
+
+        // Asegúrate de que tus funciones devuelvan promesas si son asincrónicas
+        async function addHabitaciones() {
+            // Aquí puedes poner tu lógica asincrónica real, por ejemplo una llamada a la API
+            // Por ejemplo:
+            await fetch('/api/habitaciones') // Simulando una llamada a una API
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Habitaciones añadidas', data);
+                });
+        }
+
+        async function addReservaComplemento() {
+            await fetch('/api/complementos') // Llamada simulada
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Reserva complemento añadida', data);
+                });
+        }
+
+        async function addPasajeros() {
+            await fetch('/api/pasajeros') // Llamada simulada
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Pasajeros añadidos', data);
+                });
+        }
+
+        async function totalesReserva() {
+            await fetch('/api/totales') // Llamada simulada
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Totales reservados calculados', data);
+                });
+        }
+
+        // Al cargar el DOM
+        document.addEventListener("DOMContentLoaded", function () {
+            const btnMostrar = document.getElementById("mostrar");
+            const pagoReserva = document.getElementById("pagoReserva");
+            const form = document.querySelector("form");
+
+            // Limita el campo de monto mínimo a solo números y puntos
+            $("#montoPagoMinimo").on("input", function () {
+                this.value = this.value.replace(/[^0-9.]/g, '');
+                calcularPendientePago(); // Calcula el pendiente cada vez que cambia el valor
+            });
+
+            // Maneja cambio de método de pago
+            $("input[name='pagoOpcion']").change(function () {
+                const estadoSeleccionado = $(this).data("estado");
+                $("#estadoPago").val(estadoSeleccionado);
+
+                // Mostrar/ocultar campos extra para pago mínimo
+                if (this.id === "pagoMinimo") {
+                    $("#pagoMinimoCampos").removeClass("d-none");
+                } else {
+                    $("#pagoMinimoCampos").addClass("d-none");
+                }
+
+                if (this.id === "pagoTarjeta") {
+                    $("#tarjetaCreditoDatos").removeClass("d-none");
+                } else {
+                    $("#tarjetaCreditoDatos").addClass("d-none");
+                }
+            });
+
+            // Al hacer click en botón "Confirmar Reserva"
+            btnMostrar.addEventListener("click", async function (event) {
+                event.preventDefault();
+
+                // Ejecutar funciones necesarias (estas deben estar definidas en tu JS)
+                await addHabitaciones();          // Espera a que esta función termine
+                await addReservaComplemento();    // Espera a que esta función termine
+                await addPasajeros();             // Espera a que esta función termine
+                await totalesReserva();           // Espera a que esta función termine
+
+                // Ocultar todo el form excepto #pagoReserva
+                Array.from(form.children).forEach(child => {
+                    if (child !== pagoReserva) {
+                        child.classList.add("d-none");
+                    }
+                });
+
+                // Mostrar sección de pago
+                pagoReserva.classList.remove("d-none");
+                pagoReserva.scrollIntoView({ behavior: "smooth" });
+
+                // Mostrar total
+                document.getElementById('totalReservaPago').textContent = formatoCRC(totalPagar);
+                document.getElementById('totalPagarReserva').value = formatoCRC(totalPagar);
+
+                // Cambiar texto del botón
+                btnMostrar.textContent = "Guardando...";
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+    <script>
+              $(document).ready(function () {
+
+            function obtenerValorNumerico(valorFormateado) {
+                if (!valorFormateado) return 0;
+                const limpio = valorFormateado.toString()
+                    .replace(/[₡$\s]/g, '')
+                    .replace(/\./g, '')
+                    .replace(',', '.');
+                return parseFloat(limpio) || 0;
+            }
+
+            // Actualiza el estado cuando cambia el radio seleccionado
+            $("input[name='pagoOpcion']").change(function () {
+                const estadoSeleccionado = $(this).data("estado");
+                $("#estadoPago").val(estadoSeleccionado);
+            });
+
+            $("#montoPagoMinimo").on("input", function () {
+                this.value = this.value.replace(/[^0-9.]/g, '');
+            });
+
+            $("#btnConfirmarReserva").click(function (event) {
+
+                
+                // Ejecutar funciones (sin await)
+                addHabitaciones();
+                addReservaComplemento();
+                addPasajeros();
+                totalesReserva();
+
+
+                event.preventDefault();
+
+                // Verificá si algún radio está seleccionado
+                const radioSeleccionado = $("input[name='pagoOpcion']:checked");
+
+                if (radioSeleccionado.length === 0) {
+                    Swal.fire({
+                        title: "Advertencia",
+                        text: "Debe seleccionar una opción de pago antes de continuar.",
+                        icon: "warning"
+                    });
+                    return;
+                }
+
+                // Establece el estado de pago según la opción seleccionada
+                const estadoSeleccionado = radioSeleccionado.data("estado");
+                $("#estadoPago").val(estadoSeleccionado);
+
+                // Oculta/mostrar secciones visuales
+                $(".container-fluid .row > .col-md-8").hide();
+                $(".container-fluid .row > .col-md-4").show();
+                $(".card").hide();
+                $("#resumenReservaContainer, #resumenReserva").show();
+                $("#pagoReserva").removeClass("d-none");
+
+                $(this).text("Guardando...");
+
+                // Mostrar total en texto y en campo oculto
+                document.getElementById('totalReservaPago').textContent = formatoCRC(totalPagar);
+                document.getElementById('totalPagarReserva').value = formatoCRC(totalPagar);
+
+
+                // Opcional: podrías enviar el formulario después de todo
+                // $("#formularioReserva").submit();
+            });
+        });
+
+
+          
+
+    </script>
+
+
+
+
+
 
     <script>
         $(document).ready(function () {
@@ -237,7 +576,7 @@
         });
 
 
-        $('#selectCrucero').change(function () {
+            $('#selectFecha').change(function () {
             var idCrucero = $(this).val();
             console.log("ID seleccionado: " + idCrucero); 
 
@@ -277,7 +616,7 @@
 
 
 
-        //Cargar habitaciones segun la fecha de mi crucero
+     
         function cargarHabitaciones(idFechaCrucero) {
             console.log("Llamando a cargarHabitaciones con ID de fecha: " + idFechaCrucero);
 
@@ -307,8 +646,8 @@
         }
 
 
-        //Genera las card dinamicamente donde vera las habitaciones y agregara pasajeros
-        function agregarHabitacion() {
+      
+               function agregarHabitacion() {
             var selectHabitacion = $('#selectHabitacion');
             var habitacionId = selectHabitacion.val();
             var habitacionNombre = selectHabitacion.find(':selected').data('nombre');
@@ -324,17 +663,23 @@
             }
 
             var cardId = 'habitacion' + Date.now();
-                    var precioFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(habitacionCosto);
+            var precioFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(habitacionCosto);
+
             var cardHtml = `
                 <div class="col-12 mb-3" id="${cardId}">
                     <div class="card h-100 shadow-lg border-0">
                         <div class="card-body">
                             <h5 class="card-title text-center">${habitacionId}</h5>
                             <h4 class="card-title text-center">${habitacionNombre}</h4>
-                                            <p class="card-text text-center">Precio: ${precioFormateado}</p>
+                            <p class="card-text text-center">Precio: ${precioFormateado}</p>
                             <div class="form-group text-center">
                                 <label for="cantidad${cardId}">Cantidad de pasajeros:</label>
-                                <input type="number" class="form-control w-50 mx-auto" id="cantidad${cardId}" min="1" max="10" value="1">
+                                <input type="number"
+                                       class="form-control w-50 mx-auto cantidadPasajeros"
+                                       id="cantidad${cardId}"
+                                       min="1" max="10"
+                                       value="1"
+                                       oninput="actualizarCantidadPasajeros()">
                             </div>
                             <button type="button" class="btn btn-primary mt-2 w-100" onclick="agregarPasajero('${cardId}', '${habitacionNombre}')">Agregar Pasajero</button>
                             <div id="pasajerosContainer${cardId}" class="mt-3"></div>
@@ -345,105 +690,79 @@
 
             $('#cardContainer').append(cardHtml);
 
-          
             actualizarTotalHabitaciones(habitacionCosto);
+            actualizarCantidadPasajeros(); 
 
             Swal.fire("¡Agregado!", "La habitación ha sido agregada correctamente.", "success");
         }
 
 
-        
-        function actualizarTotalHabitaciones(nuevoCosto) {
-            var totalHabitaciones = parseFloat($('#totalHabitaciones').text()) || 0;
-            totalHabitaciones += nuevoCosto;
-            $('#totalHabitaciones').text(totalHabitaciones.toFixed(2));
 
-            
-            $.ajax({
-                url: '/Reservas/ActualizarTotalHabitaciones',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ total: totalHabitaciones }),
-                success: function (response) {
-                    console.log('Total de habitaciones actualizado correctamente:', response.message);
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error al actualizar el total de habitaciones:', error);
-                }
-            });
+
+              function actualizarTotalHabitaciones(nuevoCosto) {
+           
+            const totalActual = extraerValorMonetario($('#totalHabitaciones').text());
+
+           
+            const nuevoTotal = totalActual + extraerValorMonetario(nuevoCosto);
+
+            // Actualizar el texto con formato CRC
+            $('#totalHabitaciones').text(formatoCRC(nuevoTotal));
+
+            console.log('Total de habitaciones actualizado localmente a:', formatoCRC(nuevoTotal));
+
+            // Actualizar los totales generales
+            actualizarTotales();
         }
 
 
 
         // Elimina una habitación
-        function eliminarHabitacion(cardId, habitacionId, habitacionCosto) {
-           
+               function eliminarHabitacion(cardId, habitacionId, habitacionCosto) {
+            // Eliminar elementos del DOM
             $('#' + cardId).remove();
-
-            // Actualizar el total de habitaciones localmente
-            var totalHabitaciones = parseFloat($('#totalHabitaciones').text()) || 0;
-            totalHabitaciones -= habitacionCosto;
-            $('#totalHabitaciones').text(totalHabitaciones.toFixed(2));
-
-            // Eliminar la fila de la tabla de habitaciones
             $('#tablaHabitaciones tr[data-id="' + habitacionId + '"]').remove();
 
-            // Actualizar el total en el servidor mediante AJAX
-            $.ajax({
-                url: '/Reservas/ActualizarTotalHabitaciones',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ total: totalHabitaciones }),
-                success: function (response) {
-                    console.log('Total de habitaciones actualizado correctamente tras eliminación:', response.message);
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error al actualizar el total de habitaciones tras eliminación:', error);
-                }
-            });
+            // Actualizar el total localmente
+            const totalActual = extraerValorMonetario($('#totalHabitaciones').text());
+            const costoHabitacion = extraerValorMonetario(habitacionCosto);
+            const nuevoTotal = totalActual - costoHabitacion;
 
+            // Aplicar formato CRC
+            $('#totalHabitaciones').text(formatoCRC(nuevoTotal));
+
+            console.log('Habitación eliminada. Nuevo total:', formatoCRC(nuevoTotal));
+
+            // Actualizar totales generales
+            actualizarTotales();
+
+            // Mostrar notificación
             Swal.fire("¡Eliminado!", "La habitación ha sido eliminada correctamente.", "success");
         }
 
 
 
 
-                function actualizarPasajerosTabla(idHabitacion) {
-                    const pasajeros = $(`#pasajerosContainer${idHabitacion} .pasajero-nombre`);
-                    let pasajerosData = [];
+                      function actualizarPasajerosTabla(idHabitacion) {
+            const pasajeros = $(`#pasajerosContainer${idHabitacion} .pasajero-nombre`);
+            let pasajerosData = [];
 
-                    pasajeros.each(function () {
-                        const nombre = $(this).val().trim();
-                        if (nombre) {
-                            pasajerosData.push({ nombre: nombre, habitacionId: idHabitacion });
-                        }
-                    });
-
-                   
-                    const nombresPasajeros = pasajerosData.length > 0
-                        ? pasajerosData.map(p => p.nombre).join('<br>')
-                        : 'Sin pasajeros';
-
-                    $(`#pasajerosHabitacion${idHabitacion}`).html(nombresPasajeros);
-
-                    // Enviar datos al servidor con AJAX
-                    $.ajax({
-                        url: '/Reservas/ActualizarPasajeros',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(pasajerosData),
-                        success: function (response) {
-                            if (response.success) {
-                                console.log('Pasajeros actualizados correctamente:', response.message);
-                            } else {
-                                console.error('Error en la respuesta del servidor:', response.message);
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Error al actualizar los pasajeros:', error);
-                        }
-                    });
+            pasajeros.each(function () {
+                const nombre = $(this).val().trim();
+                if (nombre) {
+                    pasajerosData.push({ nombre: nombre, habitacionId: idHabitacion });
                 }
+            });
+
+            const nombresPasajeros = pasajerosData.length > 0
+                ? pasajerosData.map(p => p.nombre).join('<br>')
+                : 'Sin pasajeros';
+
+            $(`#pasajerosHabitacion${idHabitacion}`).html(nombresPasajeros);
+
+          
+        }
+
 
 
 
@@ -513,39 +832,38 @@
 
          
             actualizarPasajerosTabla(idHabitacion);
+            actualizarCantidadPasajerosEnComplementos();
         }
 
 
-       
-       
 
 
-        //Elimina al pasajero de la habitacion
+
+
         function eliminarPasajero(idHabitacion, index) {
-          
             $(`#pasajero${idHabitacion}_${index}`).remove();
 
-      
             const contenedor = $(`#pasajerosContainer${idHabitacion}`);
             const pasajeros = contenedor.find('.pasajero');
 
-            
+            // Reasignar IDs y títulos
             pasajeros.each(function (idx) {
                 $(this).attr('id', `pasajero${idHabitacion}_${idx}`);
                 $(this).find('.card-header').text(`Pasajero ${idx + 1}`);
                 $(this).find('.pasajero-nombre').attr('id', `nombrePasajero${idHabitacion}_${idx}`);
             });
 
-         
-            actualizarPasajerosTabla(idHabitacion);
+            // ✅ ACTUALIZAR EL INPUT DE CANTIDAD DE PASAJEROS
+            $(`#cantidad${idHabitacion}`).val(pasajeros.length);
 
-           
+            actualizarPasajerosTabla(idHabitacion);
+            actualizarCantidadPasajerosEnComplementos();
         }
 
 
 
 
-    </script>
+    
 
 
 
@@ -553,194 +871,200 @@
 
 
 
-    <script>
+    
+
+
+                   
+        function extraerValorMonetario(texto) {
+            if (!texto) return 0;
+
+           
+            let valorLimpio = texto.toString()
+                                  .replace(/[^\d,.-]/g, '')  
+                                  .replace(/\./g, '')       
+                                  .replace(',', '.');        
+
+            return parseFloat(valorLimpio) || 0;
+        }
+
+      
+        function formatoCRC(monto) {
+            const montoNumerico = typeof monto === 'string' ? extraerValorMonetario(monto) : monto;
+            return new Intl.NumberFormat('es-CR', {
+                style: 'currency',
+                currency: 'CRC',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(montoNumerico);
+        }
+
+       
         function agregarComplemento() {
-            let select = document.getElementById("selectComplemento");
-            let complementoSeleccionado = select.options[select.selectedIndex];
+            const select = document.getElementById("selectComplemento");
+            const complementoSeleccionado = select.options[select.selectedIndex];
 
-            if (!complementoSeleccionado.value) {
+            if (!complementoSeleccionado?.value) {
                 alert("Seleccione un complemento válido.");
                 return;
             }
 
-            let id = complementoSeleccionado.value;
-            let nombre = complementoSeleccionado.text;
-            let detalle = complementoSeleccionado.dataset.detalle || "Sin detalles";
-            let precio = parseFloat(complementoSeleccionado.dataset.precio || "0.00");
-                    let precioFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(precio);
-            let tabla = document.getElementById("tablaComplementos").getElementsByTagName("tbody")[0];
+           
+            const id = complementoSeleccionado.value;
+            const nombre = complementoSeleccionado.text;
+            const detalle = complementoSeleccionado.dataset.detalle || "Sin detalles";
+            const precio = extraerValorMonetario(complementoSeleccionado.dataset.precio);
+            const precioFormateado = formatoCRC(precio);
+
+           
+            const tabla = document.getElementById("tablaComplementos").getElementsByTagName("tbody")[0];
+            const tablaDetalle = document.getElementById("detalleComplementos").getElementsByTagName("tbody")[0];
+
+          
             document.getElementById("tablaComplementos").classList.remove("d-none");
 
-            let fila = tabla.insertRow();
+       
+            const totalPasajeros = obtenerCantidadTotalPasajeros();
+            const subtotal = precio * totalPasajeros;
+            const subtotalFormateado = formatoCRC(subtotal);
+
+            
+            const fila = tabla.insertRow();
             fila.setAttribute("data-id", id);
 
+        
             fila.insertCell(0).textContent = id;
             fila.insertCell(1).textContent = nombre;
             fila.insertCell(2).textContent = detalle;
-                    fila.insertCell(3).textContent = precioFormateado;
+            fila.insertCell(3).textContent = precioFormateado;
 
-            let cantidadInput = document.createElement("input");
+           
+            const cantidadCell = fila.insertCell(4);
+            const cantidadInput = document.createElement("input");
             cantidadInput.type = "number";
-            cantidadInput.value = 1;
+            cantidadInput.value = totalPasajeros;
             cantidadInput.min = 1;
-            cantidadInput.className = "form-control form-control-sm";
-            cantidadInput.oninput = function () {
-                actualizarSubtotal(fila, precio, id);
-            };
-            fila.insertCell(4).appendChild(cantidadInput);
+            cantidadInput.readOnly = true;
+            cantidadInput.className = "form-control form-control-sm complemento-cantidad";
+            cantidadCell.appendChild(cantidadInput);
 
-            let subtotal = precio;
-                    let subtotalFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(subtotal);
-            let subtotalCell = fila.insertCell(5);
-                    subtotalCell.textContent = subtotalFormateado;
+           
+            fila.insertCell(5).textContent = subtotalFormateado;
 
-            fila.insertCell(6).innerHTML = `
-                <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this, ${subtotal})">Eliminar</button>
-            `;
+         
+            const accionCell = fila.insertCell(6);
+            const btnEliminar = document.createElement("button");
+            btnEliminar.type = "button";
+            btnEliminar.className = "btn btn-danger btn-sm";
+            btnEliminar.textContent = "Eliminar";
+            btnEliminar.onclick = () => eliminarFila(fila, id, subtotal);
+            accionCell.appendChild(btnEliminar);
 
-            select.remove(select.selectedIndex);
-
-       
-            let tablaDetalle = document.getElementById("detalleComplementos").getElementsByTagName("tbody")[0];
-            let filaDetalle = tablaDetalle.insertRow();
+            
+            const filaDetalle = tablaDetalle.insertRow();
             filaDetalle.setAttribute("data-id", id);
             filaDetalle.insertCell(0).textContent = nombre;
-                    filaDetalle.insertCell(1).textContent = subtotalFormateado;
+            filaDetalle.insertCell(1).textContent = subtotalFormateado;
 
+       
+            select.remove(select.selectedIndex);
+
+          
             actualizarTotalComplementos();
         }
 
+       
         function actualizarSubtotal(fila, precio, id) {
-            let cantidad = parseInt(fila.cells[4].querySelector("input").value) || 1;
-            let subtotal = precio * cantidad;
-                    let subtotalFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(subtotal);
-                    fila.cells[5].textContent = subtotalFormateado;
+            const cantidad = parseInt(fila.cells[4].querySelector("input").value) || 1;
+            const precioNumerico = extraerValorMonetario(precio);
+            const subtotal = precioNumerico * cantidad;
 
-            let filaDetalle = document.querySelector(`#detalleComplementos tbody tr[data-id="${id}"]`);
+            fila.cells[5].textContent = formatoCRC(subtotal);
+
+            const filaDetalle = document.querySelector(`#detalleComplementos tbody tr[data-id="${id}"]`);
             if (filaDetalle) {
                 filaDetalle.cells[1].textContent = subtotal.toFixed(2);
             }
 
-        
             actualizarTotalComplementos();
         }
 
-                function actualizarTotalComplementos() {
-                    let total = 0;
-                    let filas = document.querySelectorAll("#tablaComplementos tbody tr");
+        // Función para actualizar cantidades cuando cambian los pasajeros
+        function actualizarCantidadPasajerosEnComplementos() {
+            const totalPasajeros = obtenerCantidadTotalPasajeros();
+            const filas = document.querySelectorAll("#tablaComplementos tbody tr");
 
-                    filas.forEach(fila => {
-                        let subtotal = parseFloat(fila.cells[5].textContent) || 0;
-                        total += subtotal;
-                    });
-                    let totalFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(total);
-                    // Actualizar la interfaz con el nuevo total
-                    $('#totalComplementos').text(totalFormateado);
+            filas.forEach(fila => {
+                const precioTexto = fila.cells[3].textContent;
+                const precio = extraerValorMonetario(precioTexto);
+                const id = fila.getAttribute("data-id");
 
-                    // Enviar el total al servidor con AJAX
-                    $.ajax({
-                        url: '/Reservas/ActualizarTotalComplementos',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ totalComplementos: total }),
-                        success: function (response) {
-                            if (response.success) {
-                                console.log('Total de complementos actualizado correctamente:', response.message);
-                            } else {
-                                console.error('Error en la respuesta del servidor:', response.message);
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Error al actualizar el total de complementos:', error);
-                        }
-                    });
+                // Actualizar cantidad
+                const cantidadInput = fila.querySelector(".complemento-cantidad");
+                cantidadInput.value = totalPasajeros;
 
-                    // Llamar a la función que actualiza los totales generales
-                    actualizarTotales();
-                }
+                // Actualizar subtotal
+                actualizarSubtotal(fila, precio, id);
+            });
+        }
 
+        // Función para calcular el total de complementos
+        function actualizarTotalComplementos() {
+            let total = 0;
+            const filas = document.querySelectorAll("#tablaComplementos tbody tr");
 
-                function actualizarTotales() {
-                    let totalHabitaciones = parseFloat($('#totalHabitaciones').text()) || 0;
-                    let totalComplementos = parseFloat($('#totalComplementos').text()) || 0;
+            filas.forEach(fila => {
+                const subtotalText = fila.cells[5].textContent;
+                total += extraerValorMonetario(subtotalText);
+            });
 
-                    let subtotal = totalHabitaciones + totalComplementos;
-                    let impuestos = subtotal * 0.13;
-                    let precioTotal = subtotal + impuestos;
-                    let subtotalFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(subtotal);
-                    let impuestosFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(impuestos);
-                    let precioTotalFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(precioTotal);
-                    // Actualizar la interfaz
-                    $('#subtotal').text(subtotalFormateado);
-                    $('#impuestos').text(impuestosFormateado);
-                    $('#precioTotal').text(precioTotalFormateado);
+            document.getElementById('totalComplementos').textContent = formatoCRC(total);
+            actualizarTotales();
+        }
 
-                    // Enviar los datos al servidor con AJAX
-                    $.ajax({
-                        url: '/Reservas/ActualizarTotales',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            totalHabitaciones: totalHabitaciones,
-                            totalComplementos: totalComplementos,
-                            subtotal: subtotal,
-                            impuestos: impuestos,
-                            precioTotal: precioTotal
-                        }),
-                        success: function (response) {
-                            if (response.success) {
-                                console.log('Totales actualizados correctamente:', response.message);
-                            } else {
-                                console.error('Error en la respuesta del servidor:', response.message);
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Error al actualizar los totales:', error);
-                        }
-                    });
-                }
+        // Función para calcular los totales finales
+        function actualizarTotales() {
+            const totalHabitaciones = extraerValorMonetario(document.getElementById('totalHabitaciones').textContent);
+            const totalComplementos = extraerValorMonetario(document.getElementById('totalComplementos').textContent);
 
+            const subtotal = totalHabitaciones + totalComplementos;
+            const impuestos = subtotal * 0.13;
+            const totalPagar = subtotal + impuestos;
 
-        function eliminarFila(boton, subtotal) {
-            let fila = boton.closest("tr");
-            let id = fila.cells[0].textContent;
-            let nombre = fila.cells[1].textContent;
+            document.getElementById('subtotal').textContent = formatoCRC(subtotal);
+            document.getElementById('impuestos').textContent = formatoCRC(impuestos);
+            document.getElementById('precioTotal').textContent = formatoCRC(totalPagar);
+            document.getElementById('totalReservaPago').textContent = formatoCRC(totalPagar);
+            document.getElementById('totalPagarReserva').value = formatoCRC(totalPagar);
+        }
 
-            let select = document.getElementById("selectComplemento");
-            let option = document.createElement("option");
-            option.textContent = nombre;
-            option.value = id;
-            option.setAttribute("data-detalle", fila.cells[2].textContent);
-            option.setAttribute("data-precio", fila.cells[3].textContent);
-            select.appendChild(option);
+        // Función auxiliar para obtener cantidad de pasajeros
+        function obtenerCantidadTotalPasajeros() {
+            const inputs = document.querySelectorAll('.cantidadPasajeros');
+            let total = 0;
+            inputs.forEach(input => {
+                total += parseInt(input.value) || 0;
+            });
+            return total;
+        }
 
-        
-            fila.remove();
-
-       
-            let filaDetalle = document.querySelector(`#detalleComplementos tbody tr[data-id="${id}"]`);
-            if (filaDetalle) {
-                filaDetalle.remove();
-            }
-
-            let tabla = document.getElementById("tablaComplementos");
-            if (tabla.getElementsByTagName("tbody")[0].rows.length === 0) {
-                tabla.classList.add("d-none");
-            }
-
+        // Función para eliminar una fila (ejemplo)
+        function eliminarFila(fila, id, subtotal) {
            
-            actualizarTotalComplementos();
+                fila.remove();
+
+                const filaDetalle = document.querySelector(`#detalleComplementos tbody tr[data-id="${id}"]`);
+                if (filaDetalle) filaDetalle.remove();
+
+                actualizarTotalComplementos();
+            
         }
 
 
 
+ 
 
 
-
-    </script>
-
-
-    <script>
+    
 
         function addReservaComplemento() {
             return new Promise((resolve, reject) => {
@@ -811,39 +1135,39 @@
                 ).join('&');
 
                
-                let url = `@Url.Action("AddComplemento", "Reserva")?${params}`;
+                let url = `@Url.Action("AddComplemento", "ResumenReservacion")?${params}`;
 
-                // // Realizar la petición HTTP
-                // fetch(url, { method: 'GET' })
-                //     .then(response => {
-                //         if (!response.ok) {
-                //             return response.text().then(text => { throw new Error(text); });
-                //         }
-                //         return response.text();
-                //     })
-                //     .then(data => {
-                //         console.log("✅ Complemento guardado correctamente:", data);
-                //         resolve(data);
-                //     })
-                //     .catch(error => {
-                //         console.error("❌ Error en la petición:", error);
-                //         Swal.fire({
-                //             title: "Error!",
-                //             text: error.message || "Hubo un problema al procesar la solicitud.",
-                //             icon: "error"
-                //         });
-                //         reject(error);
-                //     });
+                // Realizar la petición HTTP
+                fetch(url, { method: 'GET' })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => { throw new Error(text); });
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        console.log("✅ Complemento guardado correctamente:", data);
+                        resolve(data);
+                    })
+                    .catch(error => {
+                        console.error("❌ Error en la petición:", error);
+                        Swal.fire({
+                            title: "Error!",
+                            text: error.message || "Hubo un problema al procesar la solicitud.",
+                            icon: "error"
+                        });
+                        reject(error);
+                    });
             });
         }
 
 
 
 
-    </script>
+   
 
 
-    <script>
+  
         function addPasajeros() {
             return new Promise((resolve, reject) => {
                 let pasajeros = [];
@@ -877,12 +1201,21 @@
 
                
                     $(habitacion).find(".pasajero").each(function (i, pasajeroDiv) {
-                        let nombre = $(pasajeroDiv).find("input[name*='Nombre']").val();
+                       let nombre = $(pasajeroDiv).find("input.pasajero-nombre").val();
+
                         let telefono = $(pasajeroDiv).find("input[name*='Telefono']").val();
                         let fechaNacimiento = $(pasajeroDiv).find("input[name*='FechaNacimiento']").val();
                         let correo = $(pasajeroDiv).find("input[name*='Correo']").val();
                         let direccion = $(pasajeroDiv).find("input[name*='Direccion']").val();
                         let sexo = $(pasajeroDiv).find("select[name*='Sexo']").val();
+
+
+                        console.log(nombre)
+                            console.log(telefono)
+                                console.log(fechaNacimiento)
+                                    console.log(correo)
+                                     console.log(direccion)
+                                      console.log(sexo)
 
                 
                         if (!nombre || !fechaNacimiento || !correo || !direccion || !sexo) {
@@ -925,31 +1258,191 @@
                 ).join('&');
 
                
-                let url = `@Url.Action("AddPasajero", "Reserva")?${params}`;
+                let url = `@Url.Action("AddPasajero", "ResumenReservacion")?${params}`;
 
-                // // Realizar la petición HTTP
-                // fetch(url, { method: 'GET' })
-                //     .then(response => {
-                //         if (!response.ok) {
-                //             return response.text().then(text => { throw new Error(text); });
-                //         }
-                //         return response.text();
-                //     })
-                //     .then(data => {
-                //         console.log("✅ Pasajero guardado correctamente:", data);
-                //         resolve(data);
-                //     })
-                //     .catch(error => {
-                //         console.error("❌ Error en la petición:", error);
-                //         Swal.fire({
-                //             title: "Error!",
-                //             text: error.message || "Hubo un problema al procesar la solicitud.",
-                //             icon: "error"
-                //         });
-                //         reject(error);
-                //     });
+                // Realizar la petición HTTP
+                fetch(url, { method: 'GET' })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => { throw new Error(text); });
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        console.log("✅ Pasajero guardado correctamente:", data);
+                        resolve(data);
+                    })
+                    .catch(error => {
+                        console.error("❌ Error en la petición:", error);
+                        Swal.fire({
+                            title: "Error!",
+                            text: error.message || "Hubo un problema al procesar la solicitud.",
+                            icon: "error"
+                        });
+                        reject(error);
+                    });
             });
         }
+
+
+
+        function addHabitaciones() {
+            return new Promise((resolve, reject) => {
+                let habitacionIds = [];
+
+                // Buscar todas las tarjetas de habitaciones
+                let habitaciones = $(".card-title.text-center");
+
+                if (habitaciones.length === 0) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Debe haber al menos una habitación seleccionada.",
+                        icon: "error"
+                    });
+                    return reject("No hay habitaciones seleccionadas.");
+                }
+
+                // Extraer los IDs de cada habitación
+                habitaciones.each(function () {
+                    let idHabitacion = $(this).text().trim();
+
+                    if (!isNaN(parseInt(idHabitacion))) {
+                        habitacionIds.push(parseInt(idHabitacion));
+                    }
+                });
+
+                if (habitacionIds.length === 0) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "No se pudo obtener ningún ID de habitación.",
+                        icon: "error"
+                    });
+                    return reject("IDs de habitaciones inválidos o no encontrados.");
+                }
+
+                console.log("IDs de habitaciones:", habitacionIds);
+
+                // Serializar a query string
+                let params = habitacionIds.map((id, index) => `habitaciones[${index}]=${id}`).join("&");
+
+                // Ruta al backend
+                let url = `@Url.Action("AddHabitaciones", "ResumenReservacion")?${params}`;
+
+                // Enviar con fetch
+                fetch(url, { method: "GET" })
+                    .then(response => {
+                        if (!response.ok) throw new Error("No se pudo guardar las habitaciones.");
+                        return response.text();
+                    })
+                    .then(data => {
+                        console.log("✅ Habitaciones guardadas correctamente:", data);
+                        resolve(data);
+                    })
+                    .catch(error => {
+                        console.error("❌ Error al guardar habitaciones:", error);
+                        Swal.fire({
+                            title: "Error!",
+                            text: error.message || "Ocurrió un problema al guardar las habitaciones.",
+                            icon: "error"
+                        });
+                        reject(error);
+                    });
+            });
+        }
+
+            function totalesReserva() {
+        return new Promise((resolve, reject) => {
+            // Esperar un poco para asegurar que los valores en el DOM están actualizados
+            setTimeout(() => {
+                let habitacionIds = [];
+
+                // Buscar todas las tarjetas de habitaciones (suponiendo que cada tarjeta tiene la clase 'card-title text-center')
+                let habitaciones = $(".card-title.text-center");
+
+                if (habitaciones.length === 0) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Debe haber al menos una habitación seleccionada.",
+                        icon: "error"
+                    });
+                    return reject("No hay habitaciones seleccionadas.");
+                }
+
+                // Extraer los IDs de cada habitación
+                habitaciones.each(function () {
+                    let idHabitacion = $(this).text().trim();
+
+                    if (!isNaN(parseInt(idHabitacion))) {
+                        habitacionIds.push(parseInt(idHabitacion));
+                    }
+                });
+
+                if (habitacionIds.length === 0) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "No se pudo obtener ningún ID de habitación.",
+                        icon: "error"
+                    });
+                    return reject("IDs de habitaciones inválidos o no encontrados.");
+                }
+
+                // La cantidad de habitaciones es el número de IDs obtenidos
+                let cantidadHabitaciones = habitacionIds.length;
+                console.log("Cantidad de Habitaciones:", cantidadHabitaciones);
+
+                // Obtener los totales de habitaciones y complementos
+                let totalHabitaciones = parseFloat(document.getElementById('totalHabitaciones').textContent.replace(/[^0-9.-]+/g, "")) || 0;
+                console.log("Total Habitaciones:", totalHabitaciones);
+
+                let totalComplementos = parseFloat(document.getElementById('totalComplementos').textContent.replace(/[^0-9.-]+/g, "")) || 0;
+                console.log("Total Complementos:", totalComplementos);
+
+                // Calcular los totales
+                let subtotal = totalHabitaciones + totalComplementos;
+                let impuestos = subtotal * 0.13;
+                let precioTotal = subtotal + impuestos;
+
+                console.log("Subtotal:", subtotal);
+                console.log("Impuestos (13%):", impuestos);
+                console.log("Precio total:", precioTotal);
+
+                // Enviar los totales al backend, incluyendo la cantidad de habitaciones
+                let url = `@Url.Action("TotalesReserva", "ResumenReservacion")` +
+                    `?cantidadHabitaciones=${cantidadHabitaciones}` +  // Agregamos la cantidad de habitaciones
+                    `&totalHabitaciones=${totalHabitaciones.toFixed(2)}` +
+                    `&totalComplementos=${totalComplementos.toFixed(2)}` +
+                    `&subtotal=${subtotal.toFixed(2)}` +
+                    `&impuestos=${impuestos.toFixed(2)}` +
+                    `&precioTotal=${precioTotal.toFixed(2)}`;
+
+                console.log("URL de totales:", url);
+
+                fetch(url, { method: "GET" })
+                    .then(response => {
+                        if (!response.ok) throw new Error("No se pudieron guardar los totales.");
+                        return response.text();
+                    })
+                    .then(data => {
+                        console.log("✅ Totales guardados correctamente:", data);
+                        resolve(data);
+                    })
+                    .catch(error => {
+                        console.error("❌ Error al guardar los totales:", error);
+                        Swal.fire({
+                            title: "Error!",
+                            text: error.message || "Ocurrió un problema al guardar los totales.",
+                            icon: "error"
+                        });
+                        reject(error);
+                    });
+            }, 500);  // Retrasar 500ms para asegurar que los datos están disponibles
+        });
+    }
+
+
+
+
+
 
 
     </script>
