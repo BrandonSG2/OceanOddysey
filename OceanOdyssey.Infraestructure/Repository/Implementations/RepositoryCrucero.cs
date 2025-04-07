@@ -60,13 +60,13 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                     .ThenInclude(x => x.IdpuertoNavigation)
                 .Include(x => x.IdbarcoNavigation)
                 .Include(x => x.FechaCrucero)
-                .Where(x => x.Id == idCrucero)
+                .Where(x => x.FechaCrucero.Any(f => f.Id == idCrucero))
                 .FirstOrDefaultAsync();
 
             return crucero!;
         }
 
-
+       
 
 
         public async Task<int> AddAsync(Crucero cruceroDto)
@@ -148,8 +148,6 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             }
         }
 
-
-
-
+      
     }
 }

@@ -35,12 +35,13 @@ namespace OceanOdyssey.Application.DTOs
         [Required(ErrorMessage = "{0} es un dato requerido")]
         public int? Tamanno { get; set; }
 
-        public virtual List<BarcoHabitacionDTO> BarcoHabitacion { get; set; } = null!;
 
-        public virtual List<PasajeroDTO> Pasajero { get; set; } = null!;
+        public virtual List<BarcoHabitacionDTO> BarcoHabitacion { get; set; } = new List<BarcoHabitacionDTO>();
 
-        public virtual List<PrecioHabitacionDTO> PrecioHabitacion { get; set; } = null!;
+        public virtual List<PasajeroDTO> Pasajero { get; set; } = new List<PasajeroDTO>();
 
-        public virtual List<ReservaHabitacionDTO> ReservaHabitacion { get; set; } = null!;
+        public virtual List<PrecioHabitacionDTO> PrecioHabitacion { get; set; } = new List<PrecioHabitacionDTO>();
+
+        public virtual List<ReservaHabitacionDTO> ReservaHabitacion { get; set; } = new List<ReservaHabitacionDTO>();
     }
 }

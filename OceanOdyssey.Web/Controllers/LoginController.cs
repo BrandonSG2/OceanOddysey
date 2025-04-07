@@ -62,7 +62,8 @@ namespace OceanOdyssey.Web.Controllers
 
                 new Claim(ClaimTypes.Name, usuarioDTO.Nombre),
                 new Claim(ClaimTypes.Role, usuarioDTO.Rol!),
-                new Claim(ClaimTypes.NameIdentifier, usuarioDTO.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, usuarioDTO.Id.ToString()),
+                new Claim(ClaimTypes.Email, usuarioDTO.Email),
             };
 
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

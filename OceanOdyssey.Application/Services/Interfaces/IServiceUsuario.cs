@@ -13,6 +13,7 @@ namespace OceanOdyssey.Application.Services.Interfaces
         Task<ICollection<UsuarioDTO>> ListAsync();
         Task<ICollection<ResumenReservacionDTO>> HistorialUsuario(string id);
         Task<UsuarioDTO> FindByIdAsync(string id);
+        Task<UsuarioDTO> FindByIdAsyncReserva(string id);
         Task<UsuarioDTO> LoginAsync(string id, string password);
         Task<string> AddAsync(UsuarioDTO dto);
         Task DeleteAsync(string id);

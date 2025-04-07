@@ -49,6 +49,22 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             return @object!;
         }
 
+        public async Task<Usuario> FindByIdAsyncReserva(string id)
+        {
+            if (int.TryParse(id, out int usuarioId))
+            {
+                // Buscar el usuario usando el ID convertido a int
+                var usuario = await _context.Set<Usuario>().FindAsync(usuarioId);
+                return usuario;
+            }
+            else
+            {
+                // Si el id no es un número válido, puedes devolver null o manejar el error de alguna manera
+                return null;
+            }
+        }
+
+
         public async Task<ICollection<Usuario>> ListAsync()
         {
             var collection = await _context.Set<Usuario>()

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using OceanOdyssey.Application.DTOs;
 using OceanOdyssey.Application.Services.Interfaces;
+using OceanOdyssey.Infraestructure.Models;
 using OceanOdyssey.Infraestructure.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,15 @@ namespace OceanOdyssey.Application.Services.Implementations
             _logger = logger;
         }
 
+        public async Task<ICollection<ResumenReservacionDTO>> buscarXCruceroYfecha(int IDFechaCrucero)
+        {
+            var list = await _repository.buscarXCruceroYfecha(IDFechaCrucero);
+            // map List<Barco> a ICollection<BarcoDTO>
+            var collection = _mapper.Map<ICollection<ResumenReservacionDTO>>(list);
+            // retorna la lista
+            return collection;
+        }
+
         public async Task<ResumenReservacionDTO> FindByIdAsync(int id)
         {
             var @object = await _repository.FindByIdAsync(id);
@@ -42,6 +52,16 @@ namespace OceanOdyssey.Application.Services.Implementations
             var collection = _mapper.Map<ICollection<ResumenReservacionDTO>>(list);
             // retorna la lista
             return collection;
+        }
+
+
+        public async Task<int> AddAsync(ResumenReservacionDTO dto)
+        {
+
+            var reservacionMapped = _mapper.Map<ResumenReservacion>(dto);
+
+            return await _repository.AddAsync(reservacionMapped);
+            
         }
     }
 }
