@@ -85,6 +85,48 @@ namespace OceanOdyssey.Web.Controllers
             }
         }
 
+
+
+        public async Task<IActionResult> GenerarPdf(int id)
+        {
+            try
+            {
+                // Llamamos al servicio para generar el PDF y obtener la ruta del archivo
+                var rutaPdf = await _serviceResumenReservacion.GenerarPdfResumenReservacionAsync(id);
+
+                // Verificamos si el archivo fue generado correctamente
+                if (string.IsNullOrEmpty(rutaPdf) || !System.IO.File.Exists(rutaPdf))
+                {
+                    return NotFound($"No se pudo encontrar el archivo PDF para la reserva con ID: {id}");
+                }
+
+                // Abrimos el archivo en modo de solo lectura
+                var fileStream = System.IO.File.OpenRead(rutaPdf);
+
+                // Retornamos el archivo PDF como respuesta
+                return File(fileStream, "application/pdf", $"Reserva_{id}.pdf");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // Error específico para cuando no se encuentra el recurso
+                return NotFound($"Reserva no encontrada: {ex.Message}");
+            }
+            catch (FileNotFoundException ex)
+            {
+                // Manejo específico si el archivo PDF no se encuentra
+                return NotFound($"El archivo PDF no se pudo encontrar: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Manejo general de errores
+                return StatusCode(500, $"Error al generar o devolver el PDF: {ex.Message}");
+            }
+        }
+
+
+
+
+
         [HttpGet]
         public async Task<JsonResult> GetDetalleCrucero(int id)
         {
@@ -148,7 +190,9 @@ namespace OceanOdyssey.Web.Controllers
                 id = ph.Id,
                 nombreHabitacion = ph.IdhabitacionNavigation.Nombre,
                 idHabitacion = ph.IdhabitacionNavigation.Id,
-                costo = ph.Costo
+                costo = ph.Costo,
+                minimo = ph.IdhabitacionNavigation.CapacidadMinima,
+                maximo = ph.IdhabitacionNavigation.CapacidadMaxima
             }).ToList();
 
             return Json(resultado);

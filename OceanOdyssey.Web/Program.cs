@@ -38,6 +38,7 @@ builder.Services.AddTransient<IRepositoryPais, RepositoryPais>();
 builder.Services.AddTransient<IRepositoryFechaCrucero, RepositoryFechaCrucero>();
 builder.Services.AddTransient<IRepositoryComplemento, RepositoryComplemento>();
 builder.Services.AddTransient<IRepositoryPasajero, RepositoryPasajero>();
+builder.Services.AddTransient<IRepositoryPDF, RepositoryPDF>();
 //Services
 builder.Services.AddTransient<IServiceBarco, ServiceBarco>();
 builder.Services.AddTransient<IServiceHabitacion, ServiceHabitacion>();
@@ -50,6 +51,7 @@ builder.Services.AddTransient<IServicePais, ServicePais>();
 builder.Services.AddTransient<IServiceFechaCrucero, ServiceFechaCrucero>();
 builder.Services.AddTransient<IServiceComplemento, ServiceComplemento>();
 builder.Services.AddTransient<IServicePasajero, ServicePasajero>();
+
 //Seguridad
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
