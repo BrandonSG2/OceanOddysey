@@ -15,5 +15,9 @@ namespace OceanOdyssey.Application.Services.Interfaces
         Task<ICollection<ResumenReservacionDTO>> buscarXCruceroYfecha(int IDFechaCrucero);
 
         Task<int> AddAsync(ResumenReservacionDTO dto);
+
+        Task<string> GenerarPdfResumenReservacionAsync(int id);
+
+
     }
 }

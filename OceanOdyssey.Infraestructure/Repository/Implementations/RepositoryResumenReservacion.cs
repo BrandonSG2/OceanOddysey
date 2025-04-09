@@ -8,6 +8,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+using QuestPDF.Drawing;
+using QuestPDF.Fluent;
+
+
+using System.Globalization;
+using System.ComponentModel;
+
+
 namespace OceanOdyssey.Infraestructure.Repository.Implementations
 {
     public class RepositoryResumenReservacion : IRepositoryResumenReservacion
@@ -26,7 +36,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
 
             try
             {
-           
+
                 var reservacion = new ResumenReservacion
                 {
                     Idusuario = dto.Idusuario,
@@ -45,7 +55,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                 _context.ResumenReservacion.Add(reservacion);
                 await _context.SaveChangesAsync();
 
-             
+
                 if (dto.ReservaHabitacion != null && dto.ReservaHabitacion.Any())
                 {
                     var habitaciones = dto.ReservaHabitacion.Select(h => new ReservaHabitacion
@@ -59,7 +69,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                     await _context.SaveChangesAsync();
                 }
 
-                
+
                 if (dto.ReservaComplemento != null && dto.ReservaComplemento.Any())
                 {
                     var complementos = dto.ReservaComplemento.Select(c => new ReservaComplemento
@@ -67,7 +77,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                         IdresumenReserva = reservacion.Id,
                         Idcomplemento = c.Idcomplemento,
                         Cantidad = c.Cantidad,
-                      
+
                     }).ToList();
 
                     _context.ReservaComplemento.AddRange(complementos);
@@ -80,7 +90,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-               
+
                 return -1;
             }
         }
@@ -143,5 +153,13 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                 .ToListAsync();
             return collection;
         }
+
+
+
     }
+
+
+
+
 }
+

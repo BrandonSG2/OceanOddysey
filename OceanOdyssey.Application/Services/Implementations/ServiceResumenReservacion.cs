@@ -15,13 +15,15 @@ namespace OceanOdyssey.Application.Services.Implementations
     public class ServiceResumenReservacion : IServiceResumenReservacion
     {
         private readonly IRepositoryResumenReservacion _repository;
+        private readonly IRepositoryPDF _repositoryPDF;
         private readonly IMapper _mapper;
 
         private readonly ILogger<ServiceBarco> _logger;
 
-        public ServiceResumenReservacion(IRepositoryResumenReservacion repository, IMapper mapper, ILogger<ServiceBarco> logger)
+        public ServiceResumenReservacion(IRepositoryResumenReservacion repository, IRepositoryPDF repositoryPDF, IMapper mapper, ILogger<ServiceBarco> logger)
         {
             _repository = repository;
+            _repositoryPDF = repositoryPDF;
             _mapper = mapper;
             _logger = logger;
         }
@@ -42,6 +44,24 @@ namespace OceanOdyssey.Application.Services.Implementations
             return objectMapped;
         }
 
+        public async Task<string> GenerarPdfResumenReservacionAsync(int id)
+        {
+           
+            var @object = await _repository.FindByIdAsync(id);
+
+           
+            var objectMapped = _mapper.Map<ResumenReservacion>(@object);
+
+         
+            var escritorioPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var rutaPdf = Path.Combine(escritorioPath, $"Reserva_{id}.pdf");
+
+            
+            await _repositoryPDF.CrearResumenReservacionPdfAsync(objectMapped, rutaPdf);
+
+           
+            return rutaPdf;
+        }
 
 
         public async Task<ICollection<ResumenReservacionDTO>> ListAsync()
@@ -63,5 +83,9 @@ namespace OceanOdyssey.Application.Services.Implementations
             return await _repository.AddAsync(reservacionMapped);
             
         }
+
+        
+
+
     }
 }
