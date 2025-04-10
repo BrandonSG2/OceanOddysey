@@ -197,10 +197,12 @@
                                 El número de tarjeta debe tener 16 dígitos.
                             </div>
                         </div>
-
                         <div class="mb-3">
                             <label for="fechaCaducidad" class="form-label">Fecha de Caducidad</label>
-                            <input type="month" class="form-control" id="fechaCaducidad" required>
+                            <input type="text" class="form-control" id="fechaCaducidad" placeholder="MM/AAAA" required>
+                            <div class="invalid-feedback" id="fechaCaducidadError">
+                                La fecha de caducidad debe estar en el formato MM/AAAA y no puede ser anterior al mes actual.
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -333,44 +335,59 @@
 
 
     <script>
-
-                document.getElementById('confirmarPagoButton').addEventListener('click', function (event) {
+                       document.getElementById('confirmarPagoButton').addEventListener('click', function (event) {
             event.preventDefault();
 
-            // Limpiar errores previos
             document.querySelectorAll('.form-control').forEach(function(input) {
                 input.classList.remove('is-invalid');
             });
 
             let isValid = true;
 
-            // Validación Número de Tarjeta
             let numeroTarjeta = document.getElementById('numeroTarjeta').value;
             if (numeroTarjeta.length !== 16 || isNaN(numeroTarjeta)) {
                 isValid = false;
                 document.getElementById('numeroTarjeta').classList.add('is-invalid');
             }
 
-            // Validación CVV
             let cvv = document.getElementById('cvv').value;
             if (cvv.length !== 3 || isNaN(cvv)) {
                 isValid = false;
                 document.getElementById('cvv').classList.add('is-invalid');
             }
 
-            // Validación Nombre del Titular
             let titularTarjeta = document.getElementById('titularTarjeta').value;
             if (titularTarjeta.length < 10) {
                 isValid = false;
                 document.getElementById('titularTarjeta').classList.add('is-invalid');
             }
 
+            let fechaCaducidad = document.getElementById('fechaCaducidad').value;
+            let fechaPattern = /^(0[1-9]|1[0-2])\/\d{4}$/;
+
+            if (!fechaPattern.test(fechaCaducidad)) {
+                isValid = false;
+                document.getElementById('fechaCaducidad').classList.add('is-invalid');
+            } else {
+                let fechaParts = fechaCaducidad.split('/');
+                let mes = parseInt(fechaParts[0]);
+                let año = parseInt(fechaParts[1]);
+                let fechaActual = new Date();
+                let fechaSeleccionada = new Date(año, mes - 1);
+
+                if (fechaSeleccionada < fechaActual) {
+                    isValid = false;
+                    document.getElementById('fechaCaducidad').classList.add('is-invalid');
+                }
+            }
+
             if (isValid) {
-                // Realiza el envío del formulario o la acción que desees
                 Swal.fire({
                     title: "¡Éxito!",
                     text: "Pago procesado correctamente.",
                     icon: "success"
+                }).then(() => {
+                    document.querySelector('form').submit();
                 });
             } else {
                 Swal.fire({
@@ -380,6 +397,9 @@
                 });
             }
         });
+
+
+
 
     </script>
 
@@ -1360,15 +1380,15 @@
 
 
 
-   
 
 
-  
-        function addPasajeros() {
+
+
+                      function addPasajeros() {
             return new Promise((resolve, reject) => {
                 let pasajeros = [];
+                let validationErrors = []; // Array para almacenar errores de validación
 
-               
                 let habitaciones = $("[id^='pasajerosContainer']");
 
                 if (habitaciones.length === 0) {
@@ -1380,83 +1400,94 @@
                     return reject("No hay pasajeros agregados.");
                 }
 
-              
+                // Primero validamos todos los pasajeros
+                let allValid = true;
                 habitaciones.each(function (index, habitacion) {
-              
                     let idHabitacion = $(habitacion).closest(".card").find(".card-title.text-center").first().text().trim();
 
-                
                     if (isNaN(parseInt(idHabitacion))) {
-                        Swal.fire({
-                            title: "Error!",
-                            text: `No se pudo obtener el ID de la habitación.`,
-                            icon: "error"
-                        });
-                        return reject("ID de habitación no encontrado.");
+                        validationErrors.push("No se pudo obtener el ID de la habitación.");
+                        allValid = false;
+                        return false; // Continuar con el siguiente elemento
                     }
 
-               
                     $(habitacion).find(".pasajero").each(function (i, pasajeroDiv) {
-                       let nombre = $(pasajeroDiv).find("input.pasajero-nombre").val();
-
+                        let nombre = $(pasajeroDiv).find("input.pasajero-nombre").val();
                         let telefono = $(pasajeroDiv).find("input[name*='Telefono']").val();
                         let fechaNacimiento = $(pasajeroDiv).find("input[name*='FechaNacimiento']").val();
                         let correo = $(pasajeroDiv).find("input[name*='Correo']").val();
                         let direccion = $(pasajeroDiv).find("input[name*='Direccion']").val();
                         let sexo = $(pasajeroDiv).find("select[name*='Sexo']").val();
 
-
-                        console.log(nombre)
-                            console.log(telefono)
-                                console.log(fechaNacimiento)
-                                    console.log(correo)
-                                     console.log(direccion)
-                                      console.log(sexo)
-
-                
-                        if (!nombre || !fechaNacimiento || !correo || !direccion || !sexo) {
-                            Swal.fire({
-                                title: "Error!",
-                                text: `Todos los campos obligatorios deben estar completos para el pasajero ${i + 1}.`,
-                                icon: "error"
-                            });
-                            return reject(`Datos incompletos para el pasajero ${i + 1}.`);
+                        // Validaciones
+                        if (!nombre || nombre.trim().length <= 5) {
+                            validationErrors.push(`El nombre debe tener más de 5 caracteres para el pasajero ${i + 1}.`);
+                            allValid = false;
                         }
 
-                
-                        pasajeros.push({
-                            Nombre: encodeURIComponent(nombre),
-                            Telefono: encodeURIComponent(telefono),
-                            FechaNacimiento: encodeURIComponent(fechaNacimiento),
-                            Idhabitacion: encodeURIComponent(idHabitacion),
-                            Correo: encodeURIComponent(correo),
-                            Direccion: encodeURIComponent(direccion),
-                            Sexo: encodeURIComponent(sexo)
-                        });
+                        if (!direccion || direccion.trim().length <= 10) {
+                            validationErrors.push(`La dirección debe tener más de 10 caracteres para el pasajero ${i + 1}.`);
+                            allValid = false;
+                        }
+
+                        if (!correo || correo.trim().length <= 20) {
+                            validationErrors.push(`El correo debe tener más de 20 caracteres para el pasajero ${i + 1}.`);
+                            allValid = false;
+                        }
+
+                        if (!fechaNacimiento) {
+                            validationErrors.push(`La fecha de nacimiento es obligatoria para el pasajero ${i + 1}.`);
+                            allValid = false;
+                        } else {
+                            // Validar que la fecha no sea mayor a la actual
+                            let fechaNac = new Date(fechaNacimiento);
+                            let fechaActual = new Date();
+
+                            if (fechaNac > fechaActual) {
+                                validationErrors.push(`La fecha de nacimiento no puede ser mayor a la fecha actual para el pasajero ${i + 1}.`);
+                                allValid = false;
+                            }
+                        }
+
+                        if (!sexo) {
+                            validationErrors.push(`El sexo es obligatorio para el pasajero ${i + 1}.`);
+                            allValid = false;
+                        }
+
+                        // Solo agregamos al array si todo es válido
+                        if (allValid) {
+                            pasajeros.push({
+                                Nombre: encodeURIComponent(nombre),
+                                Telefono: encodeURIComponent(telefono),
+                                FechaNacimiento: encodeURIComponent(fechaNacimiento),
+                                Idhabitacion: encodeURIComponent(idHabitacion),
+                                Correo: encodeURIComponent(correo),
+                                Direccion: encodeURIComponent(direccion),
+                                Sexo: encodeURIComponent(sexo)
+                            });
+                        }
                     });
                 });
 
-              
-                if (pasajeros.length === 0) {
+                // Mostramos todos los errores de validación juntos
+                if (validationErrors.length > 0) {
                     Swal.fire({
-                        title: "Error!",
-                        text: "No hay pasajeros agregados.",
+                        title: "Error de validación!",
+                        html: validationErrors.join('<br>'),
                         icon: "error"
                     });
-                    return reject("No hay pasajeros en la lista.");
+                    return reject("Errores de validación: " + validationErrors.join(', '));
                 }
 
+                // Si llegamos aquí, todos los datos son válidos
                 console.log("Pasajeros capturados:", pasajeros);
 
-         
                 let params = pasajeros.map((pasajero, index) =>
                     `pasajero[${index}].Nombre=${pasajero.Nombre}&pasajero[${index}].Telefono=${pasajero.Telefono}&pasajero[${index}].FechaNacimiento=${pasajero.FechaNacimiento}&pasajero[${index}].Idhabitacion=${pasajero.Idhabitacion}&pasajero[${index}].Correo=${pasajero.Correo}&pasajero[${index}].Direccion=${pasajero.Direccion}&pasajero[${index}].Sexo=${pasajero.Sexo}`
                 ).join('&');
 
-               
                 let url = `@Url.Action("AddPasajero", "ResumenReservacion")?${params}`;
 
-                // Realizar la petición HTTP
                 fetch(url, { method: 'GET' })
                     .then(response => {
                         if (!response.ok) {
@@ -1479,7 +1510,6 @@
                     });
             });
         }
-
 
 
         function addHabitaciones() {
