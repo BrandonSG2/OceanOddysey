@@ -123,7 +123,7 @@
              
 
 
-
+                 
                 <div id="pagoReserva" class="container mt-4 d-none">
                     <h3 class="text-center">Pagar Reservación</h3>
 
@@ -169,7 +169,9 @@
 
                     <div id="pagoMinimoCampos" class="d-none mt-3">
                         <div class="form-group">
-
+                            <h5 id="fechaLimiteTitulo" class="text-primary mb-3">
+                                Fecha límite de pago: <span id="fechaLimitePago">--/--/----</span>
+                            </h5>
                             <div class="form-group mt-2">
                                 <label for="totalApagar">Total a pagar:</label>
                                 <input type="text" id="totalPagarReserva" class="form-control" readonly>
@@ -190,29 +192,39 @@
 
                         <div class="mb-3">
                             <label for="numeroTarjeta" class="form-label">Número de Tarjeta (16 dígitos)</label>
-                            <input type="text" class="form-control" id="numeroTarjeta" maxlength="16">
+                            <input type="text" class="form-control" id="numeroTarjeta" maxlength="16" required>
+                            <div class="invalid-feedback" id="numeroTarjetaError">
+                                El número de tarjeta debe tener 16 dígitos.
+                            </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="fechaCaducidad" class="form-label">Fecha de Caducidad</label>
-                            <input type="month" class="form-control" id="fechaCaducidad">
+                            <input type="month" class="form-control" id="fechaCaducidad" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="cvv" class="form-label">Código CVV</label>
-                            <input type="text" class="form-control" id="cvv" maxlength="3">
+                            <input type="text" class="form-control" id="cvv" maxlength="3" required>
+                            <div class="invalid-feedback" id="cvvError">
+                                El código CVV debe tener 3 dígitos.
+                            </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="titularTarjeta" class="form-label">Nombre del Titular</label>
-                            <input type="text" class="form-control" id="titularTarjeta">
+                            <input type="text" class="form-control" id="titularTarjeta" required>
+                            <div class="invalid-feedback" id="titularTarjetaError">
+                                El nombre del titular debe tener al menos 10 caracteres.
+                            </div>
                         </div>
                     </div>
 
+                    <button type="submit" class="btn btn-primary w-100 mt-3 p-2" id="confirmarPagoButton">Confirmar Pago</button>
 
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary w-100 mt-3 p-2">Confirmar Pago</button>
-                    </div>
+
+
+                
                 </div>
 
 
@@ -319,6 +331,59 @@
     }
 
 
+
+    <script>
+
+                document.getElementById('confirmarPagoButton').addEventListener('click', function (event) {
+            event.preventDefault();
+
+            // Limpiar errores previos
+            document.querySelectorAll('.form-control').forEach(function(input) {
+                input.classList.remove('is-invalid');
+            });
+
+            let isValid = true;
+
+            // Validación Número de Tarjeta
+            let numeroTarjeta = document.getElementById('numeroTarjeta').value;
+            if (numeroTarjeta.length !== 16 || isNaN(numeroTarjeta)) {
+                isValid = false;
+                document.getElementById('numeroTarjeta').classList.add('is-invalid');
+            }
+
+            // Validación CVV
+            let cvv = document.getElementById('cvv').value;
+            if (cvv.length !== 3 || isNaN(cvv)) {
+                isValid = false;
+                document.getElementById('cvv').classList.add('is-invalid');
+            }
+
+            // Validación Nombre del Titular
+            let titularTarjeta = document.getElementById('titularTarjeta').value;
+            if (titularTarjeta.length < 10) {
+                isValid = false;
+                document.getElementById('titularTarjeta').classList.add('is-invalid');
+            }
+
+            if (isValid) {
+                // Realiza el envío del formulario o la acción que desees
+                Swal.fire({
+                    title: "¡Éxito!",
+                    text: "Pago procesado correctamente.",
+                    icon: "success"
+                });
+            } else {
+                Swal.fire({
+                    title: "Error!",
+                    text: "Por favor, revisa los campos incorrectos.",
+                    icon: "error"
+                });
+            }
+        });
+
+    </script>
+
+
     <script>
         // Convierte un string con formato ₡#,###.## a número
         function obtenerValorNumerico(valorFormateado) {
@@ -337,7 +402,7 @@
 
         // Función para calcular el pendiente por pagar
         function calcularPendientePago() {
-            const totalStr = document.getElementById("totalPagarReserva").value; // Total a pagar
+            const totalStr = document.getElementById("totalPagarReserva").value; 
             const montoPagado = parseFloat(document.getElementById("montoPagoMinimo").value) || 0; // Monto pagado
             const total = obtenerValorNumerico(totalStr);
 
@@ -386,20 +451,41 @@
             const pagoReserva = document.getElementById("pagoReserva");
             const form = document.querySelector("form");
 
-            // Limita el campo de monto mínimo a solo números y puntos
+            
             $("#montoPagoMinimo").on("input", function () {
                 this.value = this.value.replace(/[^0-9.]/g, '');
-                calcularPendientePago(); // Calcula el pendiente cada vez que cambia el valor
+                calcularPendientePago(); 
             });
 
-            // Maneja cambio de método de pago
+          
             $("input[name='pagoOpcion']").change(function () {
                 const estadoSeleccionado = $(this).data("estado");
+                console.log("Estado Sher", estadoSeleccionado);
                 $("#estadoPago").val(estadoSeleccionado);
 
-                // Mostrar/ocultar campos extra para pago mínimo
+               
                 if (this.id === "pagoMinimo") {
                     $("#pagoMinimoCampos").removeClass("d-none");
+
+                    const fechaTexto = $('#fechaFin').text().trim();
+
+                    if(fechaTexto  && fechaTexto !== '-' ){
+                        const partes = fechaTexto.split('/');
+                        const dia = parseInt(partes[0], 10);
+                        const mes = parseInt(partes[1], 10) - 1; 
+                        const anio = parseInt(partes[2], 10);
+
+                        const fechaBase = new Date(anio, mes, dia);
+                        fechaBase.setDate(fechaBase.getDate() + 10);
+
+                        const fechaLimite = fechaBase.toLocaleDateString('es-CR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
+
+                        $('#fechaLimitePago').text(fechaLimite);
+                    }
                 } else {
                     $("#pagoMinimoCampos").addClass("d-none");
                 }
@@ -567,7 +653,7 @@
         });
 
 
-            $('#selectFecha').change(function () {
+        $('#selectFecha').change(function () {
             var idCrucero = $(this).val();
             console.log("ID seleccionado: " + idCrucero); 
 
@@ -644,7 +730,7 @@
 
 
 
-                function agregarHabitacion() {
+        function agregarHabitacion() {
             var cantidadMaxima = parseInt($('#cantidadHabitaciones').val());
             var habitacionesAgregadas = $('#cardContainer').children('.col-12').length;
 
@@ -693,19 +779,29 @@
                             <h4 class="card-title text-center">${habitacionNombre}</h4>
                             <p class="card-text text-center">Precio: ${precioFormateado}</p>
                             <p class="card-text text-center text-muted">Capacidad: ${minimoPasajeros} - ${maximoPasajeros} pasajeros</p>
-                            <div class="form-group text-center">
-                                <label for="cantidad${cardId}">Cantidad de pasajeros:</label>
-                                <input type="number"
-                                       class="form-control w-50 mx-auto cantidadPasajeros"
-                                       id="cantidad${cardId}"
-                                       min="${minimoPasajeros}"
-                                       max="${maximoPasajeros}"
-                                       value="${minimoPasajeros}"
-                                       onchange="validarCantidadPasajeros('${cardId}', ${minimoPasajeros}, ${maximoPasajeros})"
-                                       oninput="actualizarCantidadPasajeros()">
+
+                            <!-- Botón de Collapse para ocultar/mostrar el contenido -->
+                                  <button class="btn btn-sm btn-outline-primary w-100 mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHabitaciones${cardId}" aria-expanded="false" aria-controls="collapseHabitaciones${cardId}">
+            <i class="bi bi-caret-down-fill"></i> Mostrar / Ocultar
+        </button>
+
+                            <!-- Contenedor Collapse para los detalles de la habitación -->
+                            <div id="collapseHabitaciones${cardId}" class="collapse mt-2">
+                                <div class="form-group text-center">
+                                    <label for="cantidad${cardId}">Cantidad de pasajeros:</label>
+                                    <input type="number"
+                                           class="form-control w-50 mx-auto cantidadPasajeros"
+                                           id="cantidad${cardId}"
+                                           min="${minimoPasajeros}"
+                                           max="${maximoPasajeros}"
+                                           value="${minimoPasajeros}"
+                                           onchange="validarCantidadPasajeros('${cardId}', ${minimoPasajeros}, ${maximoPasajeros})"
+                                           oninput="actualizarCantidadPasajeros()">
+                                </div>
+                                <button type="button" class="btn btn-primary mt-2 w-100" onclick="agregarPasajero('${cardId}', '${habitacionNombre}', ${minimoPasajeros}, ${maximoPasajeros})">Agregar Pasajero</button>
+                                <div id="pasajerosContainer${cardId}" class="mt-3"></div>
                             </div>
-                            <button type="button" class="btn btn-primary mt-2 w-100" onclick="agregarPasajero('${cardId}', '${habitacionNombre}', ${minimoPasajeros}, ${maximoPasajeros})">Agregar Pasajero</button>
-                            <div id="pasajerosContainer${cardId}" class="mt-3"></div>
+
                             <button type="button" class="btn btn-danger mt-2 w-100" onclick="eliminarHabitacion('${cardId}', '${habitacionId}', ${habitacionCosto})">Eliminar habitación</button>
                         </div>
                     </div>
@@ -718,6 +814,7 @@
 
             Swal.fire("¡Agregado!", "La habitación ha sido agregada correctamente.", "success");
         }
+
 
 
 
@@ -743,29 +840,26 @@
 
 
 
-        // Elimina una habitación
-               function eliminarHabitacion(cardId, habitacionId, habitacionCosto) {
-            // Eliminar elementos del DOM
-            $('#' + cardId).remove();
-            $('#tablaHabitaciones tr[data-id="' + habitacionId + '"]').remove();
+                          function eliminarHabitacion(cardId, habitacionId, habitacionCosto) {
+           
+            const totalPasajeros = $(`[id^="pasajero${habitacionId}_"]`).length;
 
-            // Actualizar el total localmente
+           
+            for (let i = totalPasajeros - 1; i >= 0; i--) {
+                eliminarPasajero(habitacionId, i);
+            }
+
+          
+            $(`#${cardId}`).remove();
+
+          
             const totalActual = extraerValorMonetario($('#totalHabitaciones').text());
             const costoHabitacion = extraerValorMonetario(habitacionCosto);
-            const nuevoTotal = totalActual - costoHabitacion;
+            $('#totalHabitaciones').text(formatoCRC(totalActual - costoHabitacion));
 
-            // Aplicar formato CRC
-            $('#totalHabitaciones').text(formatoCRC(nuevoTotal));
-
-            console.log('Habitación eliminada. Nuevo total:', formatoCRC(nuevoTotal));
-
-            // Actualizar totales generales
-            actualizarTotales();
-
-            // Mostrar notificación
-            Swal.fire("¡Eliminado!", "La habitación ha sido eliminada correctamente.", "success");
+          
+            Swal.fire("¡Habitación eliminada!", "Todos los pasajeros fueron removidos.", "success");
         }
-
 
 
 
@@ -792,7 +886,7 @@
 
 
 
-        //Agrega los pasajeros a la habitacion dinamicamente y los actualiza en tiempo real en la tabla
+      
        function agregarPasajero(idHabitacion, habitacionNombre, minimo, maximo) {
     const inputCantidad = $(`#cantidad${idHabitacion}`);
     let cantidad = parseInt(inputCantidad.val());
@@ -928,27 +1022,40 @@
             }
         }
 
-
         function eliminarPasajero(idHabitacion, index) {
+           
             $(`#pasajero${idHabitacion}_${index}`).remove();
 
             const contenedor = $(`#pasajerosContainer${idHabitacion}`);
             const pasajeros = contenedor.find('.pasajero');
 
-            // Reasignar IDs y títulos
-            pasajeros.each(function (idx) {
+    
+            pasajeros.each(function(idx) {
                 $(this).attr('id', `pasajero${idHabitacion}_${idx}`);
                 $(this).find('.card-header').text(`Pasajero ${idx + 1}`);
                 $(this).find('.pasajero-nombre').attr('id', `nombrePasajero${idHabitacion}_${idx}`);
             });
 
-            // ✅ ACTUALIZAR EL INPUT DE CANTIDAD DE PASAJEROS
-            $(`#cantidad${idHabitacion}`).val(pasajeros.length);
+            
+            const nuevaCantidad = pasajeros.length;
+            $(`#cantidad${idHabitacion}`).val(nuevaCantidad);
 
+           
+            if (nuevaCantidad === 0) {
+                
+                $(`#filaHabitacion${idHabitacion}`).remove();
+
+                
+                contenedor.remove();
+
+              
+                console.log(`Se eliminó la última habitación ${idHabitacion} porque no tiene pasajeros`);
+            }
+
+           
             actualizarPasajerosTabla(idHabitacion);
             actualizarCantidadPasajerosEnComplementos();
         }
-
 
 
 
@@ -1439,94 +1546,108 @@
             });
         }
 
-            function totalesReserva() {
-        return new Promise((resolve, reject) => {
-            // Esperar un poco para asegurar que los valores en el DOM están actualizados
-            setTimeout(() => {
-                let habitacionIds = [];
+                   function totalesReserva() {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    let habitacionIds = [];
+                    let habitaciones = $(".card-title.text-center");
 
-                // Buscar todas las tarjetas de habitaciones (suponiendo que cada tarjeta tiene la clase 'card-title text-center')
-                let habitaciones = $(".card-title.text-center");
-
-                if (habitaciones.length === 0) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Debe haber al menos una habitación seleccionada.",
-                        icon: "error"
-                    });
-                    return reject("No hay habitaciones seleccionadas.");
-                }
-
-                // Extraer los IDs de cada habitación
-                habitaciones.each(function () {
-                    let idHabitacion = $(this).text().trim();
-
-                    if (!isNaN(parseInt(idHabitacion))) {
-                        habitacionIds.push(parseInt(idHabitacion));
-                    }
-                });
-
-                if (habitacionIds.length === 0) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: "No se pudo obtener ningún ID de habitación.",
-                        icon: "error"
-                    });
-                    return reject("IDs de habitaciones inválidos o no encontrados.");
-                }
-
-                // La cantidad de habitaciones es el número de IDs obtenidos
-                let cantidadHabitaciones = habitacionIds.length;
-                console.log("Cantidad de Habitaciones:", cantidadHabitaciones);
-
-                // Obtener los totales de habitaciones y complementos
-                let totalHabitaciones = parseFloat(document.getElementById('totalHabitaciones').textContent.replace(/[^0-9.-]+/g, "")) || 0;
-                console.log("Total Habitaciones:", totalHabitaciones);
-
-                let totalComplementos = parseFloat(document.getElementById('totalComplementos').textContent.replace(/[^0-9.-]+/g, "")) || 0;
-                console.log("Total Complementos:", totalComplementos);
-
-                // Calcular los totales
-                let subtotal = totalHabitaciones + totalComplementos;
-                let impuestos = subtotal * 0.13;
-                let precioTotal = subtotal + impuestos;
-
-                console.log("Subtotal:", subtotal);
-                console.log("Impuestos (13%):", impuestos);
-                console.log("Precio total:", precioTotal);
-
-                // Enviar los totales al backend, incluyendo la cantidad de habitaciones
-                let url = `@Url.Action("TotalesReserva", "ResumenReservacion")` +
-                    `?cantidadHabitaciones=${cantidadHabitaciones}` +  // Agregamos la cantidad de habitaciones
-                    `&totalHabitaciones=${totalHabitaciones.toFixed(2)}` +
-                    `&totalComplementos=${totalComplementos.toFixed(2)}` +
-                    `&subtotal=${subtotal.toFixed(2)}` +
-                    `&impuestos=${impuestos.toFixed(2)}` +
-                    `&precioTotal=${precioTotal.toFixed(2)}`;
-
-                console.log("URL de totales:", url);
-
-                fetch(url, { method: "GET" })
-                    .then(response => {
-                        if (!response.ok) throw new Error("No se pudieron guardar los totales.");
-                        return response.text();
-                    })
-                    .then(data => {
-                        console.log("✅ Totales guardados correctamente:", data);
-                        resolve(data);
-                    })
-                    .catch(error => {
-                        console.error("❌ Error al guardar los totales:", error);
+                    if (habitaciones.length === 0) {
                         Swal.fire({
                             title: "Error!",
-                            text: error.message || "Ocurrió un problema al guardar los totales.",
+                            text: "Debe haber al menos una habitación seleccionada.",
                             icon: "error"
                         });
-                        reject(error);
+                        return reject("No hay habitaciones seleccionadas.");
+                    }
+
+                    // Extraer IDs de habitaciones
+                    habitaciones.each(function () {
+                        let idHabitacion = $(this).text().trim();
+                        if (!isNaN(parseInt(idHabitacion))) {
+                            habitacionIds.push(parseInt(idHabitacion));
+                        }
                     });
-            }, 500);  // Retrasar 500ms para asegurar que los datos están disponibles
-        });
-    }
+
+                    if (habitacionIds.length === 0) {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "No se pudo obtener ningún ID de habitación.",
+                            icon: "error"
+                        });
+                        return reject("IDs de habitaciones inválidos o no encontrados.");
+                    }
+
+                    let cantidadHabitaciones = habitacionIds.length;
+
+                    let totalHabitaciones = extraerValorMonetario(
+                        document.getElementById('totalHabitaciones').textContent
+                    );
+
+                    let totalComplementos = extraerValorMonetario(
+                        document.getElementById('totalComplementos').textContent
+                    );
+
+                    let subtotal = totalHabitaciones + totalComplementos;
+                    let impuestos = parseFloat((subtotal * 0.13).toFixed(2));
+                    let precioTotal = subtotal + impuestos;
+
+                    const valoresFormateados = {
+                        totalHabitaciones: formatoCRC(totalHabitaciones),
+                        totalComplementos: formatoCRC(totalComplementos),
+                        subtotal: formatoCRC(subtotal),
+                        impuestos: formatoCRC(impuestos),
+                        precioTotal: formatoCRC(precioTotal)
+                    };
+
+                    const valoresNumericos = {
+                        totalHabitaciones,
+                        totalComplementos,
+                        subtotal,
+                        impuestos,
+                        precioTotal
+                    };
+
+                    console.log("Valores numéricos:", valoresNumericos);
+
+                    // Asegurate de que esta línea esté dentro de un bloque Razor o generada por el backend
+                    const baseUrl = '@Url.Action("TotalesReserva", "ResumenReservacion")';
+                    const url = `${baseUrl}?cantidadHabitaciones=${cantidadHabitaciones}` +
+                                `&totalHabitaciones=${valoresNumericos.totalHabitaciones.toFixed(2)}` +
+                                `&totalComplementos=${valoresNumericos.totalComplementos.toFixed(2)}` +
+                                `&subtotal=${valoresNumericos.subtotal.toFixed(2)}` +
+                                `&impuestos=${valoresNumericos.impuestos.toFixed(2)}` +
+                                `&precioTotal=${valoresNumericos.precioTotal.toFixed(2)}`;
+
+                    fetch(url, { method: "GET" })
+                        .then(response => {
+                            if (!response.ok) throw new Error("No se pudieron guardar los totales.");
+                            return response.text();
+                        })
+                        .then(data => {
+                            console.log("✅ Totales guardados correctamente:", data);
+
+                            document.getElementById('totalHabitaciones').textContent = valoresFormateados.totalHabitaciones;
+                            document.getElementById('totalComplementos').textContent = valoresFormateados.totalComplementos;
+                            document.getElementById('subtotal').textContent = valoresFormateados.subtotal;
+                            document.getElementById('impuestos').textContent = valoresFormateados.impuestos;
+                            document.getElementById('precioTotal').textContent = valoresFormateados.precioTotal;
+
+                            resolve(data);
+                        })
+                        .catch(error => {
+                            console.error("❌ Error al guardar los totales:", error);
+                            Swal.fire({
+                                title: "Error!",
+                                text: error.message || "Ocurrió un problema al guardar los totales.",
+                                icon: "error"
+                            });
+                            reject(error);
+                        });
+                }, 500);
+            });
+        }
+
 
 
 
