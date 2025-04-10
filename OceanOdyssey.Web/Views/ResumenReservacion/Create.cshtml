@@ -335,68 +335,71 @@
 
 
     <script>
-                       document.getElementById('confirmarPagoButton').addEventListener('click', function (event) {
-            event.preventDefault();
+        document.getElementById('confirmarPagoButton').addEventListener('click', function (event) {
+            if (this.id === "pagoTarjeta") {
+                event.preventDefault();
 
-            document.querySelectorAll('.form-control').forEach(function(input) {
-                input.classList.remove('is-invalid');
-            });
+                document.querySelectorAll('.form-control').forEach(function(input) {
+                    input.classList.remove('is-invalid');
+                });
 
-            let isValid = true;
+                let isValid = true;
 
-            let numeroTarjeta = document.getElementById('numeroTarjeta').value;
-            if (numeroTarjeta.length !== 16 || isNaN(numeroTarjeta)) {
-                isValid = false;
-                document.getElementById('numeroTarjeta').classList.add('is-invalid');
-            }
+                let numeroTarjeta = document.getElementById('numeroTarjeta').value;
+                if (numeroTarjeta.length !== 16 || isNaN(numeroTarjeta)) {
+                    isValid = false;
+                    document.getElementById('numeroTarjeta').classList.add('is-invalid');
+                }
 
-            let cvv = document.getElementById('cvv').value;
-            if (cvv.length !== 3 || isNaN(cvv)) {
-                isValid = false;
-                document.getElementById('cvv').classList.add('is-invalid');
-            }
+                let cvv = document.getElementById('cvv').value;
+                if (cvv.length !== 3 || isNaN(cvv)) {
+                    isValid = false;
+                    document.getElementById('cvv').classList.add('is-invalid');
+                }
 
-            let titularTarjeta = document.getElementById('titularTarjeta').value;
-            if (titularTarjeta.length < 10) {
-                isValid = false;
-                document.getElementById('titularTarjeta').classList.add('is-invalid');
-            }
+                let titularTarjeta = document.getElementById('titularTarjeta').value;
+                if (titularTarjeta.length < 10) {
+                    isValid = false;
+                    document.getElementById('titularTarjeta').classList.add('is-invalid');
+                }
 
-            let fechaCaducidad = document.getElementById('fechaCaducidad').value;
-            let fechaPattern = /^(0[1-9]|1[0-2])\/\d{4}$/;
+                let fechaCaducidad = document.getElementById('fechaCaducidad').value;
+                let fechaPattern = /^(0[1-9]|1[0-2])\/\d{4}$/;
 
-            if (!fechaPattern.test(fechaCaducidad)) {
-                isValid = false;
-                document.getElementById('fechaCaducidad').classList.add('is-invalid');
-            } else {
-                let fechaParts = fechaCaducidad.split('/');
-                let mes = parseInt(fechaParts[0]);
-                let año = parseInt(fechaParts[1]);
-                let fechaActual = new Date();
-                let fechaSeleccionada = new Date(año, mes - 1);
-
-                if (fechaSeleccionada < fechaActual) {
+                if (!fechaPattern.test(fechaCaducidad)) {
                     isValid = false;
                     document.getElementById('fechaCaducidad').classList.add('is-invalid');
+                } else {
+                    let fechaParts = fechaCaducidad.split('/');
+                    let mes = parseInt(fechaParts[0]);
+                    let año = parseInt(fechaParts[1]);
+                    let fechaActual = new Date();
+                    let fechaSeleccionada = new Date(año, mes - 1);
+
+                    if (fechaSeleccionada < fechaActual) {
+                        isValid = false;
+                        document.getElementById('fechaCaducidad').classList.add('is-invalid');
+                    }
+                }
+
+                if (isValid) {
+                    Swal.fire({
+                        title: "¡Éxito!",
+                        text: "Pago procesado correctamente.",
+                        icon: "success"
+                    }).then(() => {
+                        document.querySelector('form').submit();
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Por favor, revisa los campos incorrectos.",
+                        icon: "error"
+                    });
                 }
             }
-
-            if (isValid) {
-                Swal.fire({
-                    title: "¡Éxito!",
-                    text: "Pago procesado correctamente.",
-                    icon: "success"
-                }).then(() => {
-                    document.querySelector('form').submit();
-                });
-            } else {
-                Swal.fire({
-                    title: "Error!",
-                    text: "Por favor, revisa los campos incorrectos.",
-                    icon: "error"
-                });
-            }
         });
+
 
 
 
