@@ -190,6 +190,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                                 .FontSize(10).Bold().FontColor(Colors.Red.Darken2);
 
                             col.Item().PaddingTop(20).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
+
                             col.Item().AlignRight().Text($"Subtotal: {reserva.TotalHabitaciones + totalComplementos:C}")
                                 .FontSize(11).Bold();
                             col.Item().AlignRight().Text($"Impuestos: {reserva.Impuestos:C}")
