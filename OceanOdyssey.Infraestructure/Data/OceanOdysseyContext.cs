@@ -79,6 +79,7 @@ public partial class OceanOdysseyContext : DbContext
             entity.Property(e => e.Detalle).HasMaxLength(255);
             entity.Property(e => e.Nombre).HasMaxLength(100);
             entity.Property(e => e.Precio).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Aplicado).HasMaxLength(50);
         });
 
         modelBuilder.Entity<Crucero>(entity =>

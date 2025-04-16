@@ -1,4 +1,5 @@
 ﻿using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -33,6 +34,7 @@ namespace OceanOdyssey.Web.Controllers
         // GET: HabitacionController
 
         // GET: CruceroController
+        [Authorize(Roles = "Cliente,Admin")]
         public async Task<ActionResult> Index()
         {
             var collection = await _serviceCrucero.ListAsync();
@@ -40,6 +42,7 @@ namespace OceanOdyssey.Web.Controllers
         }
 
         // GET: CruceroController/Details/5
+        [Authorize(Roles = "Cliente,Admin")]
         public async Task<ActionResult> Details(int id)
         {
             var @object = await _serviceCrucero.FindByIdAsync(id);
@@ -48,6 +51,7 @@ namespace OceanOdyssey.Web.Controllers
         }
 
         // GET: CruceroController/Create
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
 
@@ -76,6 +80,7 @@ namespace OceanOdyssey.Web.Controllers
         // POST: CruceroController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(CruceroDTO cruceroDTO, IFormFile imageFile)
         {
             MemoryStream target = new MemoryStream();
@@ -148,6 +153,7 @@ namespace OceanOdyssey.Web.Controllers
 
 
         // GET: CruceroController/Edit/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit(int id)
         {
             return View();
@@ -156,6 +162,7 @@ namespace OceanOdyssey.Web.Controllers
         // POST: CruceroController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+
         public ActionResult Edit(int id, IFormCollection collection)
         {
             try

@@ -1,0 +1,95 @@
+﻿@model IEnumerable<OceanOdyssey.Application.DTOs.ComplementoDTO>
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@{
+    ViewData["Title"] = "IndexAdmin";
+}
+
+<h1>Lista de Complementos</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear nuevo Complemento</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+           
+            <th>
+                @Html.DisplayNameFor(model => model.Nombre)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Detalle)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Precio)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Aplicado)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+           
+            <td>
+                @Html.DisplayFor(modelItem => item.Nombre)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Detalle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Precio)
+            </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Aplicado)
+                </td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Acciones">
+                        <a href="@Url.Action("Edit", new { id = item.Id })" class="btn " style="background-color:brown">
+                            <i class="bi bi-pencil-fill"></i> Editar
+                        </a>
+                        <a href="@Url.Action("Details", new { id = item.Id })" class="btn " style="background-color:aqua">
+                            <i class="bi bi-zoom-in"></i> Detalle
+                        </a>
+                    </div>
+                </td>
+        </tr>
+}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="5">
+                <div class="btn-toolbar d-flex justify-content-end" role="toolbar">
+                    <div class="btn-group" role="group">
+                        @Html.PagedListPager((IPagedList)Model, page =>
+                                 Url.Action("IndexAdmin", new { page }), new PagedListRenderOptions
+                        {
+                            Display = PagedListDisplayMode.Always,
+                            MaximumPageNumbersToDisplay = 5,
+                            LiElementClasses = new String[] { "page-item" },
+                            PageClasses = new String[] { "page-link" }
+                        }
+                                 )
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+@if (ViewBag.NotificationMessage != null)
+{
+    <script>
+        Swal.fire({
+            icon: "success",
+            title: "¡Éxito!",
+            text: "@Html.Raw(ViewBag.NotificationMessage)"
+        });
+    </script>
+}
+
+<!-- Depuración en consola -->
+<script>
+    console.log("Mensaje de ViewBag:", "@ViewBag.NotificationMessage");
+</script>

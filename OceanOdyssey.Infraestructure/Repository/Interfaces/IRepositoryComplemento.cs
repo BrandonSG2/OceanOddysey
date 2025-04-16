@@ -11,5 +11,8 @@ namespace OceanOdyssey.Infraestructure.Repository.Interfaces
     {
         Task<ICollection<Complemento>> ListAsync();
         Task<Complemento> FindByIdAsync(int id);
+      
+        Task<int> AddAsync(Complemento dto);
+        Task UpdateAsync(Complemento entity);
     }
 }

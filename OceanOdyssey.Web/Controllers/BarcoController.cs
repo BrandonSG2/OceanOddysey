@@ -8,6 +8,7 @@ using System.Text.Json;
 using OceanOdyssey.Infraestructure.Models;
 using System.Text.Json.Serialization;
 using OceanOdyssey.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 namespace OceanOdyssey.Web.Controllers
 {
     public class BarcoController : Controller
@@ -23,6 +24,7 @@ namespace OceanOdyssey.Web.Controllers
         }
 
         // GET: BarcoController
+        [Authorize(Roles = "Cliente,Admin")]
         public async Task<ActionResult> Index()
         {
             var collection = await _serviceBarco.ListAsync();
@@ -34,7 +36,7 @@ namespace OceanOdyssey.Web.Controllers
 
             return View(collection);
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> IndexAdmin(int? page)
         {
             if (TempData.ContainsKey("Mensaje"))
@@ -52,7 +54,7 @@ namespace OceanOdyssey.Web.Controllers
             return View(listaPaginada);
 
         }
-
+        [Authorize(Roles = "Cliente,Admin")]
         // GET: BarcoController/Details/5
         public async Task<ActionResult> Details(int id)
         {
@@ -61,6 +63,7 @@ namespace OceanOdyssey.Web.Controllers
         }
 
         // GET: BarcoController/Create
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             ViewBag.ListHabitaciones = await _serviceHabitacion.ListAsync();
@@ -70,6 +73,7 @@ namespace OceanOdyssey.Web.Controllers
 
             return View();
         }
+        
         public IActionResult DeleteLibro(int idHabitacion)
         {
             List<BarcoHabitacionDTO> lista = new List<BarcoHabitacionDTO>();
@@ -105,6 +109,7 @@ namespace OceanOdyssey.Web.Controllers
 
             return PartialView("_DetailHabitaciones", lista);
         }
+        
         public async Task<IActionResult> AddLibro(int id, int cantidad)
         {
             BarcoHabitacionDTO detalle = new();
@@ -157,6 +162,7 @@ namespace OceanOdyssey.Web.Controllers
         // POST: BarcoController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(BarcoDTO barcoDTO)
         {
             Console.WriteLine(JsonSerializer.Serialize(barcoDTO));
@@ -213,6 +219,7 @@ namespace OceanOdyssey.Web.Controllers
         }
 
         // GET: BarcoController/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             var barco = await _serviceBarco.FindByIdAsync(id);
@@ -258,6 +265,7 @@ namespace OceanOdyssey.Web.Controllers
         // POST: BarcoController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, BarcoDTO dto)
         {
             if (!ModelState.IsValid)

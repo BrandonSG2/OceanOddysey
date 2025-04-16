@@ -5,11 +5,12 @@
     ViewData["Title"] = "Create";
 }
 <div class="container-fluid mt-4">
+    <p class="fs-3">Tipo de cambio Hoy ₡ @ViewBag.ListCambio.venta</p>
     <div class="row">
         <!-- Columna Izquierda - Crear Reserva -->
         <div class="col-md-8">
             <form asp-action="Create">
-
+                
                 <!-- Crucero -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">

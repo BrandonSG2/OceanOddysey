@@ -11,5 +11,9 @@ namespace OceanOdyssey.Application.Services.Interfaces
     {
         Task<ICollection<ComplementoDTO>> ListAsync();
         Task<ComplementoDTO> FindByIdAsync(int id);
+        Task<int> AddAsync(ComplementoDTO dto);
+        Task<bool> ExisteNombreAsync(string nombre);
+        Task<bool> ExisteNombreActAsync(string nombre, int id);
+        Task UpdateAsync(int id, ComplementoDTO dto);
     }
 }

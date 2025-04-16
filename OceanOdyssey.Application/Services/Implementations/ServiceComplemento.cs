@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using OceanOdyssey.Application.DTOs;
 using OceanOdyssey.Application.Services.Interfaces;
+using OceanOdyssey.Infraestructure.Models;
 using OceanOdyssey.Infraestructure.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,9 @@ namespace OceanOdyssey.Application.Services.Implementations
         private readonly IRepositoryComplemento _repository;
         private readonly IMapper _mapper;
 
-        private readonly ILogger<ServiceBarco> _logger;
+        private readonly ILogger<ServiceComplemento> _logger;
 
-        public ServiceComplemento(IRepositoryComplemento repository, IMapper mapper, ILogger<ServiceBarco> logger)
+        public ServiceComplemento(IRepositoryComplemento repository, IMapper mapper, ILogger<ServiceComplemento> logger)
         {
             _repository = repository;
             _mapper = mapper;
@@ -41,6 +42,33 @@ namespace OceanOdyssey.Application.Services.Implementations
             var collection = _mapper.Map<ICollection<ComplementoDTO>>(list);
             // retorna la lista
             return collection;
+        }
+        public async Task<bool> ExisteNombreAsync(string nombre)
+        {
+            var habitaciones = await _repository.ListAsync();
+            return habitaciones.Any(h => h.Nombre.ToLower() == nombre.ToLower());
+        }
+        public async Task<bool> ExisteNombreActAsync(string nombre, int id)
+        {
+            var habitaciones = await _repository.ListAsync();
+            return habitaciones.Any(h => h.Nombre.ToLower() == nombre.ToLower() && h.Id != id);
+        }
+        public async Task<int> AddAsync(ComplementoDTO dto)
+        {
+
+            var habitacionmapped = _mapper.Map<Complemento>(dto);
+
+
+
+            return await _repository.AddAsync(habitacionmapped);
+        }
+        public async Task UpdateAsync(int id, ComplementoDTO dto)
+        {
+
+            var @object = await _repository.FindByIdAsync(id);
+
+            var entity = _mapper.Map(dto, @object!);
+            await _repository.UpdateAsync(entity);
         }
     }
 }

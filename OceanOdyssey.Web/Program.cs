@@ -51,7 +51,7 @@ builder.Services.AddTransient<IServicePais, ServicePais>();
 builder.Services.AddTransient<IServiceFechaCrucero, ServiceFechaCrucero>();
 builder.Services.AddTransient<IServiceComplemento, ServiceComplemento>();
 builder.Services.AddTransient<IServicePasajero, ServicePasajero>();
-
+builder.Services.AddTransient<IServiceCambio, ServiceCambio>();
 //Seguridad
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

@@ -1,0 +1,88 @@
+﻿@model OceanOdyssey.Application.DTOs.ComplementoDTO
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary text-center">Editar Complemento </h2>
+    <hr />
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form asp-action="Edit" class="p-5 border rounded shadow-lg bg-light" enctype="multipart/form-data" data-ajax="true"
+                  data-ajax-method="POST"
+                  data-ajax-begin="onBegin"
+                  data-ajax-failure="onFailure"
+                  data-ajax-success="onSuccess"
+                  data-ajax-complete="onComplete">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group mb-3">
+                    <label asp-for="Id" class="control-label"></label>
+                    <input asp-for="Id" class="form-control" id="Id" readonly />
+                    <span asp-validation-for="Id" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Nombre" class="control-label fw-bold"></label>
+                    <input asp-for="Nombre" class="form-control" id="Nombre" />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+                <div class="form-group  mb-3">
+                    <label asp-for="Detalle" class="control-label fw-bold"></label>
+                    <input asp-for="Detalle" class="form-control" id="Detalle" />
+                    <span asp-validation-for="Detalle" class="text-danger"></span>
+                </div>
+                <div class="form-group  mb-3">
+                    <label asp-for="Precio" class="control-label"></label>
+                    <input asp-for="Precio" class="form-control" id="Precio" type="number" />
+                    <span asp-validation-for="Precio" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Aplicado" class="control-label fw-bold"></label>
+                    <select asp-for="Aplicado" class="form-control">
+                        <option value="">-- Seleccione --</option>
+                        <option value="Habitacion" selected="@(Model.Aplicado == "Habitacion")">Habitación</option>
+                        <option value="Pasajero" selected="@(Model.Aplicado == "Pasajero")">Pasajero</option>
+                    </select>
+                    <span asp-validation-for="Aplicado" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <button type="submit" value="Guardar" class="btn btn-primary w-100 mt-3 p-2">Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a asp-action="IndexAdmin" class="btn btn-outline-dark">Volver a la lista</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<script>
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function () {
+    @if (!string.IsNullOrEmpty(ViewBag.NotificationMessage))
+    {
+                <p style="color: red;" > Mensaje desde ViewBag: @ViewBag.NotificationMessage</p>
+    }
+    @if (!string.IsNullOrEmpty(ViewBag.NotificationMessage))
+    {
+        <text>
+                Swal.fire({
+                    icon: "success",
+                    title: "¡Éxito!",
+                    text: "@ViewBag.NotificationMessage"
+                });
+        </text>
+    }
+                        });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
