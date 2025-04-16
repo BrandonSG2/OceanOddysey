@@ -19,8 +19,8 @@ namespace OceanOdyssey.Web.Controllers
         private readonly IServiceComplemento _serviceComplemento;
         private readonly IServicePasajero _servicePasajero;
         private readonly IServiceUsuario _serviceUsuario;
-
-        public ResumenReservacionController(IServiceResumenReservacion serviceResumenReservacion, IServiceCrucero serviceCrucero, IServiceFechaCrucero serviceFechaCrucero, IServiceComplemento serviceComplemento, IServicePasajero servicePasajero, IServiceUsuario serviceUsuario)
+        private readonly IServiceCambio _serviceCambio;
+        public ResumenReservacionController(IServiceResumenReservacion serviceResumenReservacion,IServiceCambio serviceCambio, IServiceCrucero serviceCrucero, IServiceFechaCrucero serviceFechaCrucero, IServiceComplemento serviceComplemento, IServicePasajero servicePasajero, IServiceUsuario serviceUsuario)
         {
             _serviceResumenReservacion = serviceResumenReservacion;
             _serviceCrucero = serviceCrucero;
@@ -28,6 +28,7 @@ namespace OceanOdyssey.Web.Controllers
             _serviceComplemento = serviceComplemento;
             _servicePasajero = servicePasajero;
             _serviceUsuario = serviceUsuario;
+            _serviceCambio= serviceCambio;
         }
 
 
@@ -38,15 +39,16 @@ namespace OceanOdyssey.Web.Controllers
 
 
 
-
+        [Authorize(Roles = "Cliente,Admin")]
         // GET: ResumenReservacion
         public async Task<ActionResult> Index()
         {
             var collection = await _serviceResumenReservacion.ListAsync();
             ViewBag.ListFechas = await _serviceFechaCrucero.ListAsync();
+             ViewBag.Cambio= await _serviceCambio.ListAsync();
             return View(collection);
         }
-
+        [Authorize(Roles = "Cliente,Admin")]
         [HttpGet]
         public async Task<IActionResult> buscarxCrucero(int idCrucero)
         {
@@ -61,6 +63,7 @@ namespace OceanOdyssey.Web.Controllers
 
         [HttpGet]
         // GET: ResumenReservacion/Details/5
+        [Authorize(Roles = "Cliente,Admin")]
         public async Task<IActionResult> Details(int? id)
         {
             try
@@ -349,11 +352,12 @@ namespace OceanOdyssey.Web.Controllers
 
 
         // GET: ResumenReservacion/Create
+        [Authorize(Roles = "Cliente,Admin")]
         public async Task<IActionResult> Create()
         {
 
             ViewBag.ListCruceros = await _serviceCrucero.ListAsync();
-
+            ViewBag.ListCambio=await _serviceCambio.ListAsync();
             ViewBag.ListComplementos = await _serviceComplemento.ListAsync();
             return View();
         }
@@ -361,6 +365,7 @@ namespace OceanOdyssey.Web.Controllers
         // POST: ResumenReservacion/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Cliente,Admin")]
         public async Task<IActionResult> Create(ResumenReservacionDTO reservacionDto)
         {
             // Recuperar el crucero

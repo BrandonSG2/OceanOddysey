@@ -1,0 +1,39 @@
+﻿@model OceanOdyssey.Application.DTOs.ComplementoDTO
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+
+<h1>Detalle del Complemento</h1>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">Información del Complemento</h3>
+        </div>
+        <div class="card-body">
+
+            <dl class="row">
+                <div class="col">
+                    <dt class="col-sm-3 font-weight-bold">Nombre:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Nombre)</dd>
+
+                    <dt class="col-sm-3 font-weight-bold">Precio:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Precio) </dd>
+                    <dt class="col-sm-3 font-weight-bold">Aplicado a:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Aplicado) </dd>
+                    
+                </div>
+                <div class="col">
+                    <dt class="col-sm-3 font-weight-bold">Descripcion:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Detalle)</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+    <div class="text-center my-4">
+        <a asp-action="IndexAdmin" class="btn btn-secondary btn-lg mx-2">Volver a la lista</a>
+    </div>
+</div>
+

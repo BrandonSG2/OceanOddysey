@@ -12,6 +12,7 @@ public partial class Complemento
     public string? Detalle { get; set; }
 
     public decimal? Precio { get; set; }
+    public string? Aplicado { get; set; }
 
     public virtual ICollection<ReservaComplemento> ReservaComplemento { get; set; } = new List<ReservaComplemento>();
 }
