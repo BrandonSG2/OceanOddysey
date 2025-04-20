@@ -34,13 +34,19 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
         public async Task<ICollection<PrecioHabitacion>> PreciosHabitacionesPorFecha(int idFechaCrucero)
         {
             return await _context.PrecioHabitacion
-                .Where(ph => ph.IdFechaCruceroNavigation!.Id == idFechaCrucero)
+                .Where(ph => ph.IdFechaCrucero == idFechaCrucero &&
+                             ph.IdhabitacionNavigation.BarcoHabitacion.Any(bh => bh.Cantidad > 0))
                 .Include(ph => ph.IdFechaCruceroNavigation)
-                .Include(ph => ph.IdhabitacionNavigation) 
+                    .ThenInclude(fc => fc.IdcruceroNavigation)
+                        .ThenInclude(c => c.IdbarcoNavigation)
+                            .ThenInclude(b => b.BarcoHabitacion)
+                .Include(ph => ph.IdhabitacionNavigation)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
-   
+
+
 
 
         public async Task<FechaCrucero> FindByIdAsync(int id)

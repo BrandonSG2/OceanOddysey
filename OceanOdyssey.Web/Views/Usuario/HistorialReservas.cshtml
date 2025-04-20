@@ -13,21 +13,13 @@
 <table class="table">
     <thead>
         <tr>
+            
             <th>
-                @Html.DisplayNameFor(model => model.Id)
+                @Html.DisplayNameFor(model => model.IdusuarioNavigation.Nombre)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Idusuario)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Idcrucero)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CantidadHabitaciones)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PrecioTotal)
-            </th>
+          
+           
+         
             <th>
                 @Html.DisplayNameFor(model => model.Impuestos)
             </th>
@@ -37,9 +29,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Estado)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaCrucero)
-            </th>
+           
             <th>
                 @Html.DisplayNameFor(model => model.TotalHabitaciones)
             </th>
@@ -49,21 +39,13 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
+         
             <td>
-                @Html.DisplayFor(modelItem => item.Id)
+                @Html.DisplayFor(modelItem => item.IdusuarioNavigation.Nombre)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Idusuario)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Idcrucero)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CantidadHabitaciones)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PrecioTotal)
-            </td>
+            
+          
+            
             <td>
                 @Html.DisplayFor(modelItem => item.Impuestos)
             </td>
@@ -73,20 +55,26 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Estado)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FechaCrucero)
-            </td>
+            
             <td>
                 @Html.DisplayFor(modelItem => item.TotalHabitaciones)
             </td>
-            <td>
+                <td>
                     <div class="btn-group" role="group" aria-label="Acciones">
-                       
-                        <a href="@Url.Action("Details","ResumenReservacion", new { id = item.Id })" class="btn " style="background-color:aqua">
+
+                        <!-- Botón Detalle -->
+                        <a href="@Url.Action("Details", "ResumenReservacion", new { id = item.Id })" class="btn" style="background-color:aqua; color:black;">
                             <i class="bi bi-zoom-in"></i> Detalle
                         </a>
+
+                        <!-- Botón Generar PDF -->
+                        <a class="btn btn-info" asp-controller="ResumenReservacion" asp-action="GenerarPdf" asp-route-id="@item.Id" style="color: black;">
+                            <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+                        </a>
+
                     </div>
-            </td>
+                </td>
+
         </tr>
 }
     </tbody>

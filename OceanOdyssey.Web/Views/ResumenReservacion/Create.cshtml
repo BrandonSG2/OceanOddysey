@@ -304,6 +304,8 @@
                             <dd class="col-sm-6" id="impuestos">0</dd>
                             <dt class="col-sm-6">Total a Pagar:</dt>
                             <dd class="col-sm-6" id="precioTotal">0</dd>
+                            <dt class="col-sm-6">Total en Dólares:</dt>
+                            <dd class="col-sm-6" id="precioTotalDolares">$0.00</dd>
                         </dl>
                     </div>
                 </div>
@@ -522,33 +524,42 @@
             });
 
             // Al hacer click en botón "Confirmar Reserva"
-            btnMostrar.addEventListener("click", async function (event) {
-                event.preventDefault();
+                   btnMostrar.addEventListener("click", async function (event) {
+            event.preventDefault();
 
-                // Ejecutar funciones necesarias (estas deben estar definidas en tu JS)
-                await addHabitaciones();          // Espera a que esta función termine
-                await addReservaComplemento();    // Espera a que esta función termine
-                await addPasajeros();             // Espera a que esta función termine
-                await totalesReserva();           // Espera a que esta función termine
+            // Ejecutar funciones necesarias
+            await addHabitaciones();
+            await addReservaComplemento();
+            await addPasajeros();
+            await totalesReserva();
 
-                // Ocultar todo el form excepto #pagoReserva
-                Array.from(form.children).forEach(child => {
-                    if (child !== pagoReserva) {
-                        child.classList.add("d-none");
-                    }
-                });
-
-                // Mostrar sección de pago
-                pagoReserva.classList.remove("d-none");
-                pagoReserva.scrollIntoView({ behavior: "smooth" });
-
-                // Mostrar total
-                document.getElementById('totalReservaPago').textContent = formatoCRC(totalPagar);
-                document.getElementById('totalPagarReserva').value = formatoCRC(totalPagar);
-
-                // Cambiar texto del botón
-                btnMostrar.textContent = "Guardando...";
+            // Mostrar alerta de éxito
+            await Swal.fire({
+                icon: 'success',
+                title: '¡Reserva registrada!',
+                text: 'La reserva se registró correctamente.',
+                confirmButtonText: 'Continuar'
             });
+
+            // Ocultar todo el form excepto #pagoReserva
+            Array.from(form.children).forEach(child => {
+                if (child !== pagoReserva) {
+                    child.classList.add("d-none");
+                }
+            });
+
+            // Mostrar sección de pago
+            pagoReserva.classList.remove("d-none");
+            pagoReserva.scrollIntoView({ behavior: "smooth" });
+
+            // Mostrar total
+            document.getElementById('totalReservaPago').textContent = formatoCRC(totalPagar);
+            document.getElementById('totalPagarReserva').value = formatoCRC(totalPagar);
+
+            // Cambiar texto del botón
+            btnMostrar.textContent = "Guardando...";
+        });
+
         });
     </script>
 
@@ -561,7 +572,7 @@
 
 
     <script>
-              $(document).ready(function () {
+                   $(document).ready(function () {
 
             function obtenerValorNumerico(valorFormateado) {
                 if (!valorFormateado) return 0;
@@ -572,7 +583,6 @@
                 return parseFloat(limpio) || 0;
             }
 
-           
             $("input[name='pagoOpcion']").change(function () {
                 const estadoSeleccionado = $(this).data("estado");
                 $("#estadoPago").val(estadoSeleccionado);
@@ -582,18 +592,14 @@
                 this.value = this.value.replace(/[^0-9.]/g, '');
             });
 
-            $("#btnConfirmarReserva").click(function (event) {
-
-                
-                addHabitaciones();
-                addReservaComplemento();
-                addPasajeros();
-                totalesReserva();
-
-
+            $("#btnConfirmarReserva").click(async function (event) {
                 event.preventDefault();
 
-             
+                await addHabitaciones();
+                await addReservaComplemento();
+                await addPasajeros();
+                await totalesReserva();
+
                 const radioSeleccionado = $("input[name='pagoOpcion']:checked");
 
                 if (radioSeleccionado.length === 0) {
@@ -605,25 +611,27 @@
                     return;
                 }
 
-              
                 const estadoSeleccionado = radioSeleccionado.data("estado");
                 $("#estadoPago").val(estadoSeleccionado);
 
-            
                 $(".container-fluid .row > .col-md-8").hide();
                 $(".container-fluid .row > .col-md-4").show();
                 $(".card").hide();
                 $("#resumenReservaContainer, #resumenReserva").show();
                 $("#pagoReserva").removeClass("d-none");
 
-                $(this).text("Guardando...");
-
-               
                 document.getElementById('totalReservaPago').textContent = formatoCRC(totalPagar);
                 document.getElementById('totalPagarReserva').value = formatoCRC(totalPagar);
 
+                $(this).text("Guardando...");
 
-           
+                // Mostrar alerta de éxito
+                await Swal.fire({
+                    icon: 'success',
+                    title: '¡Pago realizado con éxito!',
+                    text: 'El pago ha sido procesado correctamente.',
+                    confirmButtonText: 'Aceptar'
+                });
             });
         });
 
@@ -741,8 +749,9 @@
                                 data-nombre="${item.nombreHabitacion}"
                                 data-costo="${item.costo}"
                                 data-minimo="${item.minimo}"
-                                data-maximo="${item.maximo}">
-                                ${item.nombreHabitacion} - ${precioFormateado}
+                                data-maximo="${item.maximo}"
+                                data-cantidad="${item.capacidad}">
+                                ${item.nombreHabitacion} - ${precioFormateado} (Disponibles: ${item.capacidad})
                             </option>`);
                     });
                 },
@@ -754,90 +763,106 @@
 
 
 
-        function agregarHabitacion() {
-            var cantidadMaxima = parseInt($('#cantidadHabitaciones').val());
-            var habitacionesAgregadas = $('#cardContainer').children('.col-12').length;
+         function agregarHabitacion() {
+                    var cantidadMaxima = parseInt($('#cantidadHabitaciones').val());
+                    var habitacionesAgregadas = $('#cardContainer').children('.col-12').length;
 
-            if (isNaN(cantidadMaxima) || cantidadMaxima < 1) {
-                Swal.fire({
-                    title: "Error",
-                    text: "Por favor, indique una cantidad válida de habitaciones a reservar.",
-                    icon: "warning"
-                });
-                return;
-            }
+                    if (isNaN(cantidadMaxima) || cantidadMaxima < 1) {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Por favor, indique una cantidad válida de habitaciones a reservar.",
+                            icon: "warning"
+                        });
+                        return;
+                    }
 
-            if (habitacionesAgregadas >= cantidadMaxima) {
-                Swal.fire({
-                    title: "Límite alcanzado",
-                    text: `Ya ha agregado el máximo de ${cantidadMaxima} habitaciones permitido.`,
-                    icon: "info"
-                });
-                return;
-            }
+                    if (habitacionesAgregadas >= cantidadMaxima) {
+                        Swal.fire({
+                            title: "Límite alcanzado",
+                            text: `Ya ha agregado el máximo de ${cantidadMaxima} habitaciones permitido.`,
+                            icon: "info"
+                        });
+                        return;
+                    }
 
-            var selectHabitacion = $('#selectHabitacion');
-            var habitacionId = selectHabitacion.val();
-            var habitacionNombre = selectHabitacion.find(':selected').data('nombre');
-            var habitacionCosto = parseFloat(selectHabitacion.find(':selected').data('costo'));
-            var minimoPasajeros = parseInt(selectHabitacion.find(':selected').data('minimo'));
-            var maximoPasajeros = parseInt(selectHabitacion.find(':selected').data('maximo'));
+                    var selectHabitacion = $('#selectHabitacion');
+                    var habitacionId = selectHabitacion.val();
+                    var selectedOption = selectHabitacion.find(':selected');
+                    var habitacionNombre = selectedOption.data('nombre');
+                    var habitacionCosto = parseFloat(selectedOption.data('costo'));
+                    var minimoPasajeros = parseInt(selectedOption.data('minimo'));
+                    var maximoPasajeros = parseInt(selectedOption.data('maximo'));
 
-            if (!habitacionId) {
-                Swal.fire({
-                    title: "Error!",
-                    text: "Debe seleccionar una habitación antes de agregar.",
-                    icon: "error"
-                });
-                return;
-            }
+                    // ========== NUEVA VALIDACIÓN (SOLO ESTO SE AGREGA) ========== //
+                    var disponibles = parseInt(selectedOption.data('cantidad')) || 0;
+                    var habitacionesDelMismoTipo = $(`.card-title:contains('${habitacionId}')`).closest('.col-12').length;
 
-            var cardId = 'habitacion' + Date.now();
-            var precioFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(habitacionCosto);
+                    if (habitacionesDelMismoTipo >= disponibles) {
+                        Swal.fire({
+                            title: "No hay disponibilidad",
+                            html: `<b>${habitacionNombre}</b><br>
+                                  Disponibles: ${disponibles}<br>
+                                  Ya agregadas: ${habitacionesDelMismoTipo}`,
+                            icon: "warning"
+                        });
+                        return;
+                    }
+                    // ========== FIN DE NUEVO CÓDIGO ========== //
 
-            var cardHtml = `
-                <div class="col-12 mb-3" id="${cardId}">
-                    <div class="card h-100 shadow-lg border-0">
-                        <div class="card-body">
-                            <h5 class="card-title text-center">${habitacionId}</h5>
-                            <h4 class="card-title text-center">${habitacionNombre}</h4>
-                            <p class="card-text text-center">Precio: ${precioFormateado}</p>
-                            <p class="card-text text-center text-muted">Capacidad: ${minimoPasajeros} - ${maximoPasajeros} pasajeros</p>
+                    if (!habitacionId) {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Debe seleccionar una habitación antes de agregar.",
+                            icon: "error"
+                        });
+                        return;
+                    }
 
-                            <!-- Botón de Collapse para ocultar/mostrar el contenido -->
-                                  <button class="btn btn-sm btn-outline-primary w-100 mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHabitaciones${cardId}" aria-expanded="false" aria-controls="collapseHabitaciones${cardId}">
-            <i class="bi bi-caret-down-fill"></i> Mostrar / Ocultar
-        </button>
+                    var cardId = 'habitacion' + Date.now();
+                    var precioFormateado = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(habitacionCosto);
 
-                            <!-- Contenedor Collapse para los detalles de la habitación -->
-                            <div id="collapseHabitaciones${cardId}" class="collapse mt-2">
-                                <div class="form-group text-center">
-                                    <label for="cantidad${cardId}">Cantidad de pasajeros:</label>
-                                    <input type="number"
-                                           class="form-control w-50 mx-auto cantidadPasajeros"
-                                           id="cantidad${cardId}"
-                                           min="${minimoPasajeros}"
-                                           max="${maximoPasajeros}"
-                                           value="${minimoPasajeros}"
-                                           onchange="validarCantidadPasajeros('${cardId}', ${minimoPasajeros}, ${maximoPasajeros})"
-                                           oninput="actualizarCantidadPasajeros()">
+                    var cardHtml = `
+                        <div class="col-12 mb-3" id="${cardId}">
+                            <div class="card h-100 shadow-lg border-0">
+                                <div class="card-body">
+                                    <h5 class="card-title text-center">${habitacionId}</h5>
+                                    <h4 class="card-title text-center">${habitacionNombre}</h4>
+                                    <p class="card-text text-center">Precio: ${precioFormateado}</p>
+                                    <p class="card-text text-center text-muted">Capacidad: ${minimoPasajeros} - ${maximoPasajeros} pasajeros</p>
+
+                                    <button class="btn btn-sm btn-outline-primary w-100 mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHabitaciones${cardId}" aria-expanded="false" aria-controls="collapseHabitaciones${cardId}">
+                                        <i class="bi bi-caret-down-fill"></i> Mostrar / Ocultar
+                                    </button>
+
+                                    <div id="collapseHabitaciones${cardId}" class="collapse mt-2">
+                                        <div class="form-group text-center">
+                                            <label for="cantidad${cardId}">Cantidad de pasajeros:</label>
+                                            <input type="number"
+                                                   class="form-control w-50 mx-auto cantidadPasajeros"
+                                                   id="cantidad${cardId}"
+                                                   min="${minimoPasajeros}"
+                                                   max="${maximoPasajeros}"
+                                                   value="${minimoPasajeros}"
+                                                   onchange="validarCantidadPasajeros('${cardId}', ${minimoPasajeros}, ${maximoPasajeros})"
+                                                   oninput="actualizarCantidadPasajeros()">
+                                        </div>
+                                        <button type="button" class="btn btn-primary mt-2 w-100" onclick="agregarPasajero('${cardId}', '${habitacionNombre}', ${minimoPasajeros}, ${maximoPasajeros})">Agregar Pasajero</button>
+                                        <div id="pasajerosContainer${cardId}" class="mt-3"></div>
+                                    </div>
+
+                                    <button type="button" class="btn btn-danger mt-2 w-100" onclick="eliminarHabitacion('${cardId}', '${habitacionId}', ${habitacionCosto})">Eliminar habitación</button>
                                 </div>
-                                <button type="button" class="btn btn-primary mt-2 w-100" onclick="agregarPasajero('${cardId}', '${habitacionNombre}', ${minimoPasajeros}, ${maximoPasajeros})">Agregar Pasajero</button>
-                                <div id="pasajerosContainer${cardId}" class="mt-3"></div>
                             </div>
+                        </div>`;
 
-                            <button type="button" class="btn btn-danger mt-2 w-100" onclick="eliminarHabitacion('${cardId}', '${habitacionId}', ${habitacionCosto})">Eliminar habitación</button>
-                        </div>
-                    </div>
-                </div>`;
+                    $('#cardContainer').append(cardHtml);
 
-            $('#cardContainer').append(cardHtml);
+                    actualizarTotalHabitaciones(habitacionCosto);
+                    actualizarCantidadPasajeros();
 
-            actualizarTotalHabitaciones(habitacionCosto);
-            actualizarCantidadPasajeros();
+                    Swal.fire("¡Agregado!", "La habitación ha sido agregada correctamente.", "success");
+                }
 
-            Swal.fire("¡Agregado!", "La habitación ha sido agregada correctamente.", "success");
-        }
 
 
 
@@ -1241,8 +1266,7 @@
             actualizarTotales();
         }
 
-        // Función para calcular los totales finales
-        function actualizarTotales() {
+                function actualizarTotales() {
             const totalHabitaciones = extraerValorMonetario(document.getElementById('totalHabitaciones').textContent);
             const totalComplementos = extraerValorMonetario(document.getElementById('totalComplementos').textContent);
 
@@ -1250,11 +1274,31 @@
             const impuestos = subtotal * 0.13;
             const totalPagar = subtotal + impuestos;
 
+            // Actualizar valores en colones
             document.getElementById('subtotal').textContent = formatoCRC(subtotal);
             document.getElementById('impuestos').textContent = formatoCRC(impuestos);
             document.getElementById('precioTotal').textContent = formatoCRC(totalPagar);
             document.getElementById('totalReservaPago').textContent = formatoCRC(totalPagar);
             document.getElementById('totalPagarReserva').value = formatoCRC(totalPagar);
+
+            // Calcular y mostrar el total en dólares
+            const tipoCambioElement = document.querySelector('.fs-3');
+            if (tipoCambioElement) {
+                const tipoCambioText = tipoCambioElement.textContent;
+                const tipoCambioMatch = tipoCambioText.match(/[\d,.]+/);
+
+                if (tipoCambioMatch) {
+                    const tipoCambio = parseFloat(tipoCambioMatch[0].replace(',', '.'));
+                    if (tipoCambio && tipoCambio > 0) {
+                        const totalDolares = totalPagar / tipoCambio;
+                        document.getElementById("precioTotalDolares").textContent = `$${totalDolares.toFixed(2)}`;
+                        document.getElementById("totalReservaDolares").textContent = totalDolares.toFixed(2);
+                        return;
+                    }
+                }
+            }
+            document.getElementById("precioTotalDolares").textContent = "$0.00";
+            document.getElementById("totalReservaDolares").textContent = "0.00";
         }
 
         // Función auxiliar para obtener cantidad de pasajeros

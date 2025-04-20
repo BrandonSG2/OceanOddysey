@@ -77,6 +77,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
             int ID=int.Parse(id);
             var collection = await _context.Set<ResumenReservacion>()
                                     .Where(r => r.Idusuario == ID)
+                                    .Include(u => u.IdusuarioNavigation)
                                     .ToListAsync();
             return collection;
         }
