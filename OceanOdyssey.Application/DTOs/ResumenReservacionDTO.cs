@@ -35,6 +35,7 @@ namespace OceanOdyssey.Application.DTOs
 
         public DateOnly? FechaPago { get; set; }
         [Display(Name = "Total a pagar por habitaciones")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal TotalHabitaciones { get; set; }
 
         public virtual FechaCruceroDTO FechaCruceroNavigation { get; set; } = null!;

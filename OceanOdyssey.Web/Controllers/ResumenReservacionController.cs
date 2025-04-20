@@ -169,16 +169,49 @@ namespace OceanOdyssey.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPreciosHabitacionesPorFecha(int idFechaCrucero)
         {
-            var preciosDTO = await _serviceFechaCrucero.PreciosHabitacionesPorFecha(idFechaCrucero);
+            var precios = await _serviceFechaCrucero.PreciosHabitacionesPorFecha(idFechaCrucero);
 
-            var resultado = preciosDTO.Select(ph => new
+            var resultado = precios.Select(ph =>
             {
-                id = ph.Id,
-                nombreHabitacion = ph.IdhabitacionNavigation.Nombre,
-                idHabitacion = ph.IdhabitacionNavigation.Id,
-                costo = ph.Costo,
-                minimo = ph.IdhabitacionNavigation.CapacidadMinima,
-                maximo = ph.IdhabitacionNavigation.CapacidadMaxima
+
+                var barco = ph?.IdFechaCruceroNavigation?
+                              .IdcruceroNavigation?
+                              .IdbarcoNavigation;
+
+
+                int cantidadDisponible = 0;
+                string nombreHabitacion = "Desconocido";
+                int capacidadMinima = 0;
+                int capacidadMaxima = 0;
+
+
+                if (barco != null && barco.BarcoHabitacion != null)
+                {
+                    var habitacionBarco = barco.BarcoHabitacion
+                        .FirstOrDefault(bh => bh.Idhabitacion == ph.Idhabitacion);
+
+                    cantidadDisponible = habitacionBarco?.Cantidad ?? 0;
+                }
+
+
+                if (ph?.IdhabitacionNavigation != null)
+                {
+                    nombreHabitacion = ph.IdhabitacionNavigation.Nombre ?? "Desconocido";
+                    capacidadMinima = ph.IdhabitacionNavigation.CapacidadMinima;
+                    capacidadMaxima = ph.IdhabitacionNavigation.CapacidadMaxima;
+                }
+
+
+                return new
+                {
+                    id = ph?.Id ?? 0,
+                    nombreHabitacion = nombreHabitacion,
+                    idHabitacion = ph?.Idhabitacion ?? 0,
+                    costo = ph?.Costo ?? 0,
+                    minimo = capacidadMinima,
+                    maximo = capacidadMaxima,
+                    capacidad = cantidadDisponible
+                };
             }).ToList();
 
             return Json(resultado);
@@ -492,7 +525,14 @@ namespace OceanOdyssey.Web.Controllers
                 TempData["Error"] = "Ocurrió un error al guardar la reservación.";
                 return RedirectToAction("Create");
             }
-            return RedirectToAction("Index");
+            if (User.IsInRole("Cliente"))
+            {
+                return RedirectToAction("HistorialReservas", "Usuario", new { id = usuarioId });
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
         }
 
 

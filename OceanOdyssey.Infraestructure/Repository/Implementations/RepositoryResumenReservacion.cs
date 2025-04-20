@@ -36,7 +36,16 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
 
             try
             {
+              
+                var crucero = await _context.Set<Crucero>().FindAsync(dto.Idcrucero);
+                if (crucero == null)
+                {
+                    throw new Exception("Crucero no encontrado");
+                }
 
+                var idBarco = crucero.Idbarco;
+
+            
                 var reservacion = new ResumenReservacion
                 {
                     Idusuario = dto.Idusuario,
@@ -54,22 +63,52 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
 
                 _context.ResumenReservacion.Add(reservacion);
                 await _context.SaveChangesAsync();
-
-
                 if (dto.ReservaHabitacion != null && dto.ReservaHabitacion.Any())
                 {
-                    var habitaciones = dto.ReservaHabitacion.Select(h => new ReservaHabitacion
-                    {
-                        IdresumenReserva = reservacion.Id,
-                        Idhabitacion = h.Idhabitacion,
-                        Idpasajero = h.Idpasajero,
-                    }).ToList();
+                    var habitacionesParaGuardar = new List<ReservaHabitacion>();
+                    var barcoHabitacionesParaActualizar = new List<BarcoHabitacion>();
 
-                    _context.ReservaHabitacion.AddRange(habitaciones);
+                    foreach (var reserva in dto.ReservaHabitacion)
+                    {
+                        
+                        habitacionesParaGuardar.Add(new ReservaHabitacion
+                        {
+                            IdresumenReserva = reservacion.Id,
+                            Idhabitacion = reserva.Idhabitacion,
+                            Idpasajero = reserva.Idpasajero
+                        });
+
+                       
+                        var barcoHabitacion = await _context.BarcoHabitacion
+                            .FirstOrDefaultAsync(bh => bh.Idbarco == idBarco && bh.Idhabitacion == reserva.Idhabitacion);
+
+                        if (barcoHabitacion != null)
+                        {
+                            if (barcoHabitacion.Cantidad <= 0)
+                            {
+                                throw new Exception($"No hay disponibilidad para la habitación {reserva.Idhabitacion}");
+                            }
+
+                            barcoHabitacion.Cantidad--;
+
+
+                            if (!barcoHabitacionesParaActualizar.Contains(barcoHabitacion))
+                            {
+                                barcoHabitacionesParaActualizar.Add(barcoHabitacion);
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception($"No se encontró la relación entre el barco y la habitación {reserva.Idhabitacion}");
+                        }
+                    }
+
+                    _context.ReservaHabitacion.AddRange(habitacionesParaGuardar);
+                    _context.BarcoHabitacion.UpdateRange(barcoHabitacionesParaActualizar);
                     await _context.SaveChangesAsync();
                 }
 
-
+               
                 if (dto.ReservaComplemento != null && dto.ReservaComplemento.Any())
                 {
                     var complementos = dto.ReservaComplemento.Select(c => new ReservaComplemento
@@ -77,7 +116,6 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                         IdresumenReserva = reservacion.Id,
                         Idcomplemento = c.Idcomplemento,
                         Cantidad = c.Cantidad,
-
                     }).ToList();
 
                     _context.ReservaComplemento.AddRange(complementos);
@@ -94,6 +132,7 @@ namespace OceanOdyssey.Infraestructure.Repository.Implementations
                 return -1;
             }
         }
+
 
 
         public async Task<ICollection<ResumenReservacion>> buscarXCruceroYfecha(int IDFechaCrucero)
